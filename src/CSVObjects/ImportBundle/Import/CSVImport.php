@@ -4,7 +4,7 @@ namespace CSVObjects\ImportBundle\Import;
 
 use Symfony\Component\HttpFoundation\File\File;
 
-class ImportFormat
+class CSVImport
 {
     const SCHOOL_FROM_ID = 'Name';
 
@@ -104,15 +104,20 @@ class ImportFormat
     private function readFile(File $file)
     {
         $data = array();
-        if ('xlsx' === $file->guessExtension()) {
-            // @TODO read excel to array
-        } else {
+
+        if ('csv' === $file->guessExtension()) {
             $fileHandle = fopen($file->getPathname(), 'r');
             $data       = array();
+
             while (!feof($fileHandle)) {
                 $data[] = fgetcsv($fileHandle);
             }
+
             fclose($fileHandle);
+        } elseif ('xlsx' === $file->guessExtension()) {
+            // @TODO read excel to array
+        } else {
+            throw new \InvalidArgumentException('Unrecognised file type. The valid types are CSV and XLSX');
         }
 
         return $data;
@@ -133,7 +138,7 @@ class ImportFormat
 
         foreach ($data[0] as $column) {
             if (!isset($this->columns[$column])) {
-                throw new \InvalidArgumentException('File contains an unrecognised column ' . $column);
+                throw new \InvalidArgumentException('File contains an unexpected column ' . $column);
             }
         }
     }
