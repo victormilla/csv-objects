@@ -1,0 +1,32 @@
+{
+    "name": "jd/csv-objects",
+    "license": "MIT",
+    "type": "project",
+    "description": "Library to import CSV or XLSX files into an array of objects according to an specified definition",
+    "autoload": {
+        "psr-4": { "": "src/" },
+        "classmap": [ "app/AppKernel.php", "app/AppCache.php" ]
+    },
+    "require": {
+        "php": ">=5.5.9",
+        "symfony/symfony": "3.1.*",
+        "symfony/monolog-bundle": "^2.8"
+    },
+    "require-dev": {
+        "symfony/phpunit-bridge": "^3.0",
+        "phpunit/phpunit": "^4.8"
+    },
+    "config": {
+        "platform": {
+            "php": "5.5.9"
+        }
+    },
+    "extra": {
+        "symfony-app-dir": "app",
+        "symfony-bin-dir": "bin",
+        "symfony-var-dir": "var",
+        "branch-alias": {
+            "dev-master": "3.1-dev"
+        }
+    }
+}
