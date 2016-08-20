@@ -1,0 +1,6 @@
+php:
+  build: development/php
+  ports:
+    - "22:22"
+  volumes:
+    - .:/var/www/csv-objects
