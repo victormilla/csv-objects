@@ -1,0 +1,8 @@
+# Sample as seen in README.md
+name: Fruits definition
+columns:
+    File Version: { expect: '38' }
+    Name:         { fruit: name }
+    Weight:       ~
+    Colour:       { validate: ['red', 'yellow'] }
+returns: CSVObjects\ImportBundle\Tests\Objects\Fruit

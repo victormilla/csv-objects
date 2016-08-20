@@ -13,7 +13,7 @@ format can be quite sophisticated, so two examples are provided:
 ```yaml
 name: Fruits definition                              # (Optional) Name of the import definition
 columns:                                             # (Required) An associative array with the headings of the columns in the file that will be imported
-    Name: { fruit: name }                            # 'fruit' is a shortname for the object being created for the list (defined below) and name will be the argument passed to the constructor                                         
+    Name:   { fruit: name }                          # 'fruit' is a shortname for the object being created for the list (defined below) and name will be the argument passed to the constructor                                         
     Weight: ~                                        # Null indicates that it can be ignored
 returns: CSVObjects\ImportBundle\Tests\Objects\Fruit # The class of the elements that will be returned 
 ```
@@ -22,8 +22,10 @@ returns: CSVObjects\ImportBundle\Tests\Objects\Fruit # The class of the elements
 
 ```yaml
 name: Fruits definition                             
-columns:                                            
-    Name: { fruit: name }                           
-    Weight: ~                                       
+columns:
+    File Version: { expect: 38 }                      # (Optional) Expects indicates that the row value must always be as stated
+    Name:         { fruit: name }                           
+    Weight:       ~
+    Colour:       { validate: ['red', 'yellow'] }     # (Optional) Valid values that this column could have
 returns: CSVObjects\ImportBundle\Tests\Objects\Fruit
 ```

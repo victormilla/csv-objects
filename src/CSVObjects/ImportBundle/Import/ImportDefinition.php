@@ -33,6 +33,11 @@ class ImportDefinition
      */
     private $returnDataColumns = array();
 
+    /**
+     * @var callable[][]
+     */
+    private $validations;
+
     public function __construct(array $definition)
     {
         $resolver = new OptionsResolver();
@@ -81,7 +86,43 @@ class ImportDefinition
      */
     private function parseColumnDefinition(string $columnName, array $definition)
     {
-        // TODO
+        // Expect
+        if (isset($definition['expect'])) {
+            $expectedValue = $definition['expect'];
+
+            $this->validations[$columnName][] = function ($row) use ($columnName, $expectedValue) {
+                if ($row[$columnName] !== $expectedValue) {
+                    throw new \InvalidArgumentException(
+                        sprintf(
+                            'The column \'%s\' is expected to always have the value \'%s\'. However, there is a row there the value is \'%s\'',
+                            $columnName,
+                            $expectedValue,
+                            $row[$columnName]
+                        )
+                    );
+                }
+            };
+
+            unset ($definition['expect']);
+        }
+
+        // Validate
+        if (isset($definition['validate'])) {
+            $validValues = $definition['validate'];
+
+            $this->validations[$columnName][] = function ($row) use ($columnName, $validValues) {
+                if (!in_array($row[$columnName], $validValues, true)) {
+                    throw new \InvalidArgumentException(
+                        sprintf(
+                            'The column \'%s\' is expected to have one of these values: (%s). However, there is a row there the value is \'%s\' which is not on the list',
+                            $columnName,
+                            json_encode($validValues),
+                            $row[$columnName]
+                        )
+                    );
+                }
+            };
+        }
 
         if (1 === count($definition)) {
             // It must be talking about objects.
@@ -133,6 +174,12 @@ class ImportDefinition
     public function getArgumentsByData(array $row)
     {
         $r = array();
+
+        foreach ($this->validations as $validations) {
+            foreach ($validations as $validation) {
+                $validation($row);
+            }
+        }
 
         foreach ($this->returnDataColumns as $columnName => $arguments) {
             $args   = [];

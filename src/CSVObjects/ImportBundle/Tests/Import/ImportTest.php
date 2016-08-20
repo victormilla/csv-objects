@@ -81,4 +81,33 @@ class ImportTest extends KernelTestCase
         $this->assertEquals('Pineapple', $pineapple->getName());
         $this->assertEquals('Banana', $banana->getName());
     }
+
+    public function testFruitsFull()
+    {
+        $definition = new ImportDefinition(Yaml::parse(file_get_contents(__DIR__ . '/ImportDefinitions/fruits-full.yml')));
+        $file       = __DIR__ . '/CSVs/fruits-full.csv';
+        $fruits     = CSVImport::import($definition, $file);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testValueNotAsExpected()
+    {
+        $definition = new ImportDefinition(Yaml::parse(file_get_contents(__DIR__ . '/ImportDefinitions/fruits-full.yml')));
+        $file       = __DIR__ . '/CSVs/fruits-full-wrong-expect.csv';
+
+        CSVImport::import($definition, $file);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testValueNotInAllowedValues()
+    {
+        $definition = new ImportDefinition(Yaml::parse(file_get_contents(__DIR__ . '/ImportDefinitions/fruits-full.yml')));
+        $file       = __DIR__ . '/CSVs/fruits-full-wrong-validate.csv';
+
+        CSVImport::import($definition, $file);
+    }
 }
