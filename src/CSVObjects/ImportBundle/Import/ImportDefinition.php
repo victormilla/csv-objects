@@ -21,6 +21,18 @@ class ImportDefinition
      */
     private $columns;
 
+    /**
+     * Known classes alias
+     *
+     * @var string[]
+     */
+    private $classes;
+
+    /**
+     * @var string[]
+     */
+    private $returnDataColumns = array();
+
     public function __construct(array $definition)
     {
         $resolver = new OptionsResolver();
@@ -37,7 +49,7 @@ class ImportDefinition
             $this->columnNames[] = $columnName;
 
             if (null !== $columnDefinition) {
-                $this->columns[$columnName] = $this->parseColumnDefinition($columnDefinition);
+                $this->columns[$columnName] = $this->parseColumnDefinition($columnName, $columnDefinition);
             }
         }
 
@@ -62,13 +74,29 @@ class ImportDefinition
     }
 
     /**
-     * @param array $definition
+     * @param string $columnName
+     * @param array  $definition
      *
      * @return mixed
      */
-    private function parseColumnDefinition(array $definition)
+    private function parseColumnDefinition(string $columnName, array $definition)
     {
         // TODO
+
+        if (1 === count($definition)) {
+            // It must be talking about objects.
+
+            $classAlias = key($definition);
+            $arguments  = end($definition);
+
+            if (isset($this->classes[$classAlias])) {
+                // TODO
+            } else {
+                // It is the return class
+
+                $this->returnDataColumns[$columnName] = $arguments;
+            }
+        }
 
         return true;
     }
@@ -87,5 +115,31 @@ class ImportDefinition
     public function getClass()
     {
         return $this->options['returns'];
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getColumnNames()
+    {
+        return $this->columnNames;
+    }
+
+    /**
+     * @param array $row
+     *
+     * @return array[]
+     */
+    public function getArgumentsByData(array $row)
+    {
+        $r = array();
+
+        foreach ($this->returnDataColumns as $columnName => $arguments) {
+            $args   = [];
+            $args[] = $row[$columnName];
+            $r[]    = $args;
+        }
+
+        return $r;
     }
 }

@@ -4,3 +4,6 @@ php:
     - "22:22"
   volumes:
     - .:/var/www/csv-objects
+    - ./development/php/php.ini:/usr/local/etc/php/php.ini
+  environment:
+    PHP_IDE_CONFIG: serverName=csv-objects

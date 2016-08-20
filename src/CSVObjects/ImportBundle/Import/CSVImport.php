@@ -2,79 +2,45 @@
 
 namespace CSVObjects\ImportBundle\Import;
 
+use ReflectionClass;
 use Symfony\Component\HttpFoundation\File\File;
 
 class CSVImport
 {
-    const SCHOOL_FROM_ID = 'Name';
-
     /**
-     * @var string
+     * @var ImportDefinition
      */
-    private $name;
+    private $definition;
 
     /**
      * @var string[]
      */
-    private $columns;
+    private $columnNames;
 
     /**
-     * @var string
+     * @var ReflectionClass
      */
-    private $schoolColumn;
+    private $reflectionClass;
 
-    /**
-     * @var string
-     */
-    private $schoolSearchBy;
-
-    /**
-     * @var string
-     */
-
-    private $studentColumn;
-
-    /**
-     * @var string
-     */
-    private $studentSearchBy;
-
-    /**
-     * @var string
-     */
-    private $id;
-
-    /**
-     * @var FullResultId[]
-     */
-    private $assessments;
-
-    public function __construct($id, $name, $columns, $schoolColumn, $schoolSearchBy, $studentColumn, $studentSearchBy, $assessments)
+    public function __construct(ImportDefinition $definition)
     {
-        $this->id              = $id;
-        $this->name            = $name;
-        $this->columns         = array_flip($columns);
-        $this->schoolColumn    = $schoolColumn;
-        $this->schoolSearchBy  = $schoolSearchBy;
-        $this->studentColumn   = $studentColumn;
-        $this->studentSearchBy = $studentSearchBy;
-        $this->assessments     = $assessments;
+        $this->definition      = $definition;
+        $this->columnNames     = $definition->getColumnNames();
+        $this->reflectionClass = new ReflectionClass($definition->getClass());
     }
 
     /**
-     * @return string
+     * @param ImportDefinition $definition
+     * @param string           $filename
+     *
+     * @return array
      */
-    public function getId()
+    public static function import(ImportDefinition $definition, string $filename)
     {
-        return $this->id;
-    }
+        $import = new CSVImport($definition);
+        $file   = new File($filename);
 
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
+        return $import->extractResultsFromFile($file);
     }
 
     /**
@@ -82,15 +48,19 @@ class CSVImport
      *
      * @return array
      */
-    public function extractResultsFromFile(File $file)
+    private function extractResultsFromFile(File $file)
     {
         $data = $this->readFile($file);
+
         $this->validate($data);
 
-        $header  = array_flip($data[0]);
-        $results = array();
-        for ($i = 1; count($data); $i++) {
-            $results[] = $this->createResult($header, $data[$i]);
+        $headings = $data[0];
+        $results  = array();
+
+        for ($i = 1; $i < count($data); $i++) {
+            foreach ($this->createResults(array_combine($headings, $data[$i])) as $result) {
+                $results[] = $result;
+            }
         }
 
         return $results;
@@ -105,16 +75,26 @@ class CSVImport
     {
         $data = array();
 
-        if ('csv' === $file->guessExtension()) {
+        $extension = strtolower($file->getExtension());
+
+        if (!in_array($extension, ['csv', 'xlsx'])) {
+            $extension = $file->guessExtension();
+        }
+
+        if ('csv' === $extension) {
             $fileHandle = fopen($file->getPathname(), 'r');
             $data       = array();
 
             while (!feof($fileHandle)) {
-                $data[] = fgetcsv($fileHandle);
+                $line = fgetcsv($fileHandle);
+
+                if (false !== $line) {
+                    $data[] = $line;
+                }
             }
 
             fclose($fileHandle);
-        } elseif ('xlsx' === $file->guessExtension()) {
+        } elseif ('xlsx' === $extension) {
             // @TODO read excel to array
         } else {
             throw new \InvalidArgumentException('Unrecognised file type. The valid types are CSV and XLSX');
@@ -129,30 +109,33 @@ class CSVImport
     private function validate($data)
     {
         if (!is_array($data) || !isset($data[0])) {
-            throw new \InvalidArgumentException('File does not have CSV content');
+            throw new \InvalidArgumentException('File does not have content');
         }
 
-        if (count($data[0]) !== count($this->columns)) {
+        if (count($data[0]) !== count($this->columnNames)) {
             throw new \InvalidArgumentException('File does not have the required number of columns');
         }
 
         foreach ($data[0] as $column) {
-            if (!isset($this->columns[$column])) {
+            if (!in_array($column, $this->columnNames)) {
                 throw new \InvalidArgumentException('File contains an unexpected column ' . $column);
             }
         }
     }
 
     /**
-     * @param string[] $header
-     * @param string[] $row
+     * @param array $row
      *
-     * @return FullResult
+     * @return object[]
      */
-    private function createResult($header, $row)
+    private function createResults(array $row)
     {
-        // @TODO return parsed row
+        $r = array();
 
-        return null;
+        foreach ($this->definition->getArgumentsByData($row) as $instance) {
+            $r[] = $this->reflectionClass->newInstanceArgs($instance);
+        }
+
+        return $r;
     }
 }

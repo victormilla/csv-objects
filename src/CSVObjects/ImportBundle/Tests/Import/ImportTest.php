@@ -2,10 +2,14 @@
 
 namespace CSVObjects\ImportBundle\Tests\Import;
 
+use CSVObjects\ImportBundle\Import\CSVImport;
+use CSVObjects\ImportBundle\Import\ImportDefinition;
+use CSVObjects\ImportBundle\Tests\Objects\Fruit;
 use CSVObjects\ImportBundle\Tests\Objects\School;
 use CSVObjects\ImportBundle\Tests\Objects\Student;
 use CSVObjects\ImportBundle\Tests\Objects\Subject;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Yaml\Yaml;
 
 class ImportTest extends KernelTestCase
 {
@@ -53,5 +57,28 @@ class ImportTest extends KernelTestCase
         $this->assertCount(2, $this->students['st-johns'], 'There were two students expected in St John\'s');
         $this->assertCount(1, $this->students['lighthouse'], 'There was one student expected in Farewell');
         $this->assertCount(2, $this->subjects, 'There where two subjects expected');
+    }
+
+    public function testFruitsSimple()
+    {
+        $definition = new ImportDefinition(Yaml::parse(file_get_contents(__DIR__ . '/ImportDefinitions/fruits-basic.yml')));
+        $file       = __DIR__ . '/CSVs/fruits-basic.csv';
+        $fruits     = CSVImport::import($definition, $file);
+
+        /** @var Fruit[] $fruits */
+
+        $this->assertCount(3, $fruits);
+
+        foreach ($fruits as $fruit) {
+            $this->assertInstanceOf('CSVObjects\ImportBundle\Tests\Objects\Fruit', $fruit);
+        }
+
+        $apple     = $fruits[0];
+        $pineapple = $fruits[1];
+        $banana    = $fruits[2];
+
+        $this->assertEquals('Apple', $apple->getName());
+        $this->assertEquals('Pineapple', $pineapple->getName());
+        $this->assertEquals('Banana', $banana->getName());
     }
 }
