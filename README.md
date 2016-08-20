@@ -1,3 +1,5 @@
+[![Build status](https://circleci.com/gh/j-d/csv-objects.svg?style=shield&circle-token=:circle-token)](https://circleci.com/gh/j-d/csv-objects)
+
 # CSV to Objects
 
 Library to import CSV or XLSX files into an array of objects according to an specified definition
