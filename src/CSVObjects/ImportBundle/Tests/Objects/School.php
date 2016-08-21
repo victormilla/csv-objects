@@ -13,4 +13,12 @@ class School
     {
         $this->name = $name;
     }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
 }

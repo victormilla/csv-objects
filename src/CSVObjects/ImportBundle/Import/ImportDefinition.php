@@ -69,6 +69,11 @@ class ImportDefinition
      */
     private $objectProcurers = array();
 
+    /**
+     * @var array[]
+     */
+    private $objectProcurersArguments = array();
+
     public function __construct(array $definition)
     {
         $resolver = new OptionsResolver();
@@ -228,7 +233,10 @@ class ImportDefinition
         // Mapped Class
         foreach ($this->classes as $mappedClassName => $mappedClass) {
             if ($mappedClassName !== $this->returnClass && isset($definition[$mappedClassName])) {
-                $this->objectProcurers[$columnName] = $mappedClass;
+                $this->objectProcurers[$columnName]          = $mappedClass;
+                $this->objectProcurersArguments[$columnName] = is_array($definition[$mappedClassName])
+                    ? $definition[$mappedClassName]
+                    : array($definition[$mappedClassName]);
 
                 unset($definition[$mappedClassName]);
             }
@@ -331,7 +339,13 @@ class ImportDefinition
 
         // Convert relevant columns to objects
         foreach ($this->objectProcurers as $columnName => $objectProcurer) {
-            $row[$columnName] = $objectProcurer->procure($row[$columnName]);
+            $arguments = array();
+
+            foreach ($this->objectProcurersArguments[$columnName] as $argument) {
+                $arguments[] = $this->makeArgumentReplacements($argument, $row);;
+            }
+
+            $row[$columnName] = $objectProcurer->procure($arguments);
         }
 
         foreach ($this->returnDataColumns as $columnName => $arguments) {

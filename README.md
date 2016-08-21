@@ -43,3 +43,5 @@ classes:
     fruit:    ['CSVObjects\ImportBundle\Tests\Objects\Fruit', 'getFruitFromFullInfo']                                         # If the mapped class is an array, it will make a static call to the specified method to create the class
     contract: ['CSVObjects\ImportBundle\Tests\Objects\Contract', 'getContractFromId' ]
 ```
+
+For a more complex example see `school-results.yml` and `school-results.csv`.

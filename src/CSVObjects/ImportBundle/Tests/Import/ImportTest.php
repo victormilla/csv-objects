@@ -6,58 +6,34 @@ use CSVObjects\ImportBundle\Import\CSVImport;
 use CSVObjects\ImportBundle\Import\ImportDefinition;
 use CSVObjects\ImportBundle\Tests\Objects\Contract;
 use CSVObjects\ImportBundle\Tests\Objects\Fruit;
+use CSVObjects\ImportBundle\Tests\Objects\Result;
 use CSVObjects\ImportBundle\Tests\Objects\School;
+use CSVObjects\ImportBundle\Tests\Objects\SchoolRepository;
 use CSVObjects\ImportBundle\Tests\Objects\Student;
-use CSVObjects\ImportBundle\Tests\Objects\Subject;
+use CSVObjects\ImportBundle\Tests\Objects\StudentRepository;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Yaml\Yaml;
 
 class ImportTest extends KernelTestCase
 {
-    /**
-     * @var School[]
-     */
-    private $schools;
-
-    /**
-     * @var Student[][]
-     */
-    private $students;
-
-    /**
-     * @var Subject[]
-     */
-    private $subjects;
-
     protected function setUp()
     {
-        $this->schools = [
-            'st-johns'   => new School('St John\'s School'),
-            'lighthouse' => new School('Lighthouse Academy'),
-        ];
+        $stJohns    = new School('St John\'s School');
+        $lighthouse = new School('Lighthouse Academy');
 
-        $this->students = [
-            'st-johns'   => [
-                1 => new Student($this->schools['lighthouse'], 1),
-                2 => new Student($this->schools['lighthouse'], 2),
-            ],
-            'lighthouse' => [
-                1 => new Student($this->schools['lighthouse'], 1),
-            ],
-        ];
+        SchoolRepository::addSchool($stJohns);
+        SchoolRepository::addSchool($lighthouse);
 
-        $this->subjects = [
-            'EN' => new Subject('English'),
-            'MA' => new Subject('Maths'),
-        ];
+        StudentRepository::addStudent(new Student($stJohns, 1));
+        StudentRepository::addStudent(new Student($stJohns, 2));
+        StudentRepository::addStudent(new Student($lighthouse, 1));
     }
 
     public function testEnvironment()
     {
-        $this->assertCount(2, $this->schools, 'There were two schools expected');
-        $this->assertCount(2, $this->students['st-johns'], 'There were two students expected in St John\'s');
-        $this->assertCount(1, $this->students['lighthouse'], 'There was one student expected in Farewell');
-        $this->assertCount(2, $this->subjects, 'There where two subjects expected');
+        $this->assertCount(2, SchoolRepository::getAllSchools(), 'There were two schools expected');
+        $this->assertCount(2, StudentRepository::getAllStudentsInSchool('St John\'s School'), 'There were two students expected in St John\'s');
+        $this->assertCount(1, StudentRepository::getAllStudentsInSchool('Lighthouse Academy'), 'There was one student expected in Farewell');
     }
 
     public function testFruitsSimple()
@@ -235,5 +211,33 @@ class ImportTest extends KernelTestCase
         $banana    = $fruits[2];
 
         $this->assertInstanceOf(Contract::class, $apple->getContract());
+        $this->assertInstanceOf(Contract::class, $pineapple->getContract());
+        $this->assertInstanceOf(Contract::class, $banana->getContract());
+    }
+
+    public function testStudentResults()
+    {
+        $definition = new ImportDefinition(Yaml::parse(file_get_contents(__DIR__ . '/ImportDefinitions/school-results.yml')));
+        $file       = __DIR__ . '/CSVs/school-results.csv';
+        $results    = CSVImport::import($definition, $file);
+
+        /** @var Result[] $results */
+
+        $this->assertCount(6, $results);
+
+        $this->assertEquals('St John\'s School', $results[1]->getStudent()->getSchool()->getName());
+        $this->assertEquals('1', $results[1]->getStudent()->getId());
+        $this->assertEquals('MA', $results[1]->getSubjectCode());
+        $this->assertEquals('6b', $results[1]->getGrade());
+
+        $this->assertEquals('St John\'s School', $results[3]->getStudent()->getSchool()->getName());
+        $this->assertEquals('2', $results[3]->getStudent()->getId());
+        $this->assertEquals('MA', $results[3]->getSubjectCode());
+        $this->assertEquals('4c', $results[3]->getGrade());
+
+        $this->assertEquals('Lighthouse Academy', $results[4]->getStudent()->getSchool()->getName());
+        $this->assertEquals('1', $results[4]->getStudent()->getId());
+        $this->assertEquals('EN', $results[4]->getSubjectCode());
+        $this->assertEquals('7a', $results[4]->getGrade());
     }
 }

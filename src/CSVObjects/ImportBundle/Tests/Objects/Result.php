@@ -10,19 +10,43 @@ class Result
     private $student;
 
     /**
-     * @var Subject
+     * @var string
      */
-    private $subject;
+    private $subjectCode;
 
     /**
      * @var string
      */
     private $grade;
 
-    public function __construct(Student $student, Subject $subject, string $grade)
+    public function __construct(Student $student, string $subjectCode, string $grade)
     {
-        $this->student = $student;
-        $this->subject = $subject;
-        $this->grade   = $grade;
+        $this->student     = $student;
+        $this->subjectCode = $subjectCode;
+        $this->grade       = $grade;
+    }
+
+    /**
+     * @return Student
+     */
+    public function getStudent(): Student
+    {
+        return $this->student;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSubjectCode(): string
+    {
+        return $this->subjectCode;
+    }
+
+    /**
+     * @return string
+     */
+    public function getGrade(): string
+    {
+        return $this->grade;
     }
 }

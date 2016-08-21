@@ -19,4 +19,20 @@ class Student
         $this->school    = $school;
         $this->studentId = $studentId;
     }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->studentId;
+    }
+
+    /**
+     * @return School
+     */
+    public function getSchool()
+    {
+        return $this->school;
+    }
 }
