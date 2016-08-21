@@ -6,6 +6,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ImportDefinition
 {
+    const COLUMN_DELIMITER = '#';
+
     /**
      * @var array
      */
@@ -36,7 +38,12 @@ class ImportDefinition
     /**
      * @var callable[][]
      */
-    private $validations;
+    private $validations = array();
+
+    /**
+     * @var string[][]
+     */
+    private $maps = array();
 
     public function __construct(array $definition)
     {
@@ -103,7 +110,7 @@ class ImportDefinition
                 }
             };
 
-            unset ($definition['expect']);
+            unset($definition['expect']);
         }
 
         // Validate
@@ -122,8 +129,18 @@ class ImportDefinition
                     );
                 }
             };
+
+            unset($definition['validate']);
         }
 
+        // Map
+        if (isset($definition['map'])) {
+            $this->maps[$columnName] = $definition['map'];
+
+            unset($definition['map']);
+        }
+
+        // Class
         if (1 === count($definition)) {
             // It must be talking about objects.
 
@@ -175,18 +192,81 @@ class ImportDefinition
     {
         $r = array();
 
+        // Process row validation rules
         foreach ($this->validations as $validations) {
             foreach ($validations as $validation) {
                 $validation($row);
             }
         }
 
+        // Replace values by their aliases
+        foreach ($this->maps as $columnName => $map) {
+            $row[$columnName] = isset($map[$row[$columnName]])
+                ? $map[$row[$columnName]]
+                : null;
+        }
+
         foreach ($this->returnDataColumns as $columnName => $arguments) {
-            $args   = [];
-            $args[] = $row[$columnName];
-            $r[]    = $args;
+            $args = [];
+
+            if (!is_array($arguments)) {
+                $arguments = array($arguments);
+            }
+
+            foreach ($arguments as $argument) {
+                $args[] = $this->makeArgumentReplacements($argument, $row);;
+            }
+
+            $r[] = $args;
         }
 
         return $r;
+    }
+
+    /**
+     * @param string $argument
+     * @param array  $row
+     *
+     * @return string
+     */
+    private function makeArgumentReplacements(string $argument, array $row)
+    {
+        $numberMatches = preg_match_all(
+            sprintf('/%s[^%s]+?%s/', self::COLUMN_DELIMITER, self::COLUMN_DELIMITER, self::COLUMN_DELIMITER),
+            $argument,
+            $matches
+        );
+
+        if (false === $numberMatches) {
+            throw new \RuntimeException('Something went wrong when finding the replacements of the argument');
+        }
+
+        foreach ($matches[0] as $match) {
+            $search       = substr($match, 1, -1);
+            $originalType = gettype($row[$search]);
+            $argument = str_replace(sprintf('%s%s%s', self::COLUMN_DELIMITER, $search, self::COLUMN_DELIMITER), $row[$search], $argument);
+
+            // Restore the original data type
+            switch ($originalType) {
+                case 'string':
+                    break;
+                case 'boolean':
+                    $argument = boolval($argument);
+                    break;
+                case 'integer':
+                    $argument = intval($argument);
+                    break;
+                case 'double':
+                    $argument = floatval($argument);
+                    break;
+                case 'NULL':
+                    $argument = null;
+                    break;
+                default:
+                    throw new \LogicException('Cannot process values of type ' . $originalType);
+            }
+        }
+
+        return $argument;
     }
 }

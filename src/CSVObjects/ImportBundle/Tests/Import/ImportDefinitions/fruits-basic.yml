@@ -1,6 +1,6 @@
 # Sample as seen in README.md
 name: Fruits definition
 columns:
-    Name:   { fruit: name }
+    Name:   { fruit: '#Name#' }
     Weight: ~
 returns: CSVObjects\ImportBundle\Tests\Objects\Fruit

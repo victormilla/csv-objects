@@ -87,6 +87,30 @@ class ImportTest extends KernelTestCase
         $definition = new ImportDefinition(Yaml::parse(file_get_contents(__DIR__ . '/ImportDefinitions/fruits-full.yml')));
         $file       = __DIR__ . '/CSVs/fruits-full.csv';
         $fruits     = CSVImport::import($definition, $file);
+
+        /** @var Fruit[] $fruits */
+
+        $this->assertCount(3, $fruits);
+
+        foreach ($fruits as $fruit) {
+            $this->assertInstanceOf('CSVObjects\ImportBundle\Tests\Objects\Fruit', $fruit);
+        }
+
+        $apple     = $fruits[0];
+        $pineapple = $fruits[1];
+        $banana    = $fruits[2];
+
+        $this->assertEquals('Apple', $apple->getName());
+        $this->assertEquals('Pineapple', $pineapple->getName());
+        $this->assertEquals('Banana', $banana->getName());
+
+        $this->assertEquals('red', $apple->getColour());
+        $this->assertEquals('yellow', $pineapple->getColour());
+        $this->assertEquals('yellow', $banana->getColour());
+
+        $this->assertEquals('UK', $apple->getOriginCountry());
+        $this->assertEquals('Spain', $pineapple->getOriginCountry());
+        $this->assertEquals('Spain', $pineapple->getOriginCountry());
     }
 
     /**
@@ -109,5 +133,16 @@ class ImportTest extends KernelTestCase
         $file       = __DIR__ . '/CSVs/fruits-full-wrong-validate.csv';
 
         CSVImport::import($definition, $file);
+    }
+
+    public function testUnmappedValue()
+    {
+        $definition = new ImportDefinition(Yaml::parse(file_get_contents(__DIR__ . '/ImportDefinitions/fruits-full.yml')));
+        $file       = __DIR__ . '/CSVs/fruits-full-unmapped-value.csv';
+        $banana     = CSVImport::import($definition, $file)[2];
+
+        /** @var Fruit $banana */
+
+        $this->assertNull($banana->getOriginCountry());
     }
 }
