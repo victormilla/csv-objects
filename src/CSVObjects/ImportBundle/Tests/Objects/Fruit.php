@@ -34,20 +34,9 @@ class Fruit
      */
     private $expiryDate;
 
-    public function __construct(
-        string $name,
-        string $colour = null,
-        string $originCountry = null,
-        string $originCity = null,
-        string $class = null,
-        string $expiryDate = null
-    ) {
-        $this->name          = $name;
-        $this->colour        = $colour;
-        $this->originCountry = $originCountry;
-        $this->originCity    = $originCity;
-        $this->class         = $class;
-        $this->expiryDate    = $expiryDate;
+    public function __construct(string $name)
+    {
+        $this->name = $name;
     }
 
     /**
@@ -59,11 +48,27 @@ class Fruit
     }
 
     /**
+     * @param string $colour
+     */
+    public function setColour(string $colour)
+    {
+        $this->colour = $colour;
+    }
+
+    /**
      * @return string|null
      */
     public function getColour()
     {
         return $this->colour;
+    }
+
+    /**
+     * @param string $originCountry
+     */
+    public function setOriginCountry(string $originCountry)
+    {
+        $this->originCountry = $originCountry;
     }
 
     /**
@@ -75,11 +80,27 @@ class Fruit
     }
 
     /**
+     * @param string $originCity
+     */
+    public function setOriginCity(string $originCity)
+    {
+        $this->originCity = $originCity;
+    }
+
+    /**
      * @return string|null
      */
     public function getOriginCity()
     {
         return $this->originCity;
+    }
+
+    /**
+     * @param string $class
+     */
+    public function setClass(string $class)
+    {
+        $this->class = $class;
     }
 
     /**
@@ -91,10 +112,61 @@ class Fruit
     }
 
     /**
+     * @param string $expiryDate
+     */
+    public function setExpiryDate(string $expiryDate)
+    {
+        $this->expiryDate = $expiryDate;
+    }
+
+    /**
      * @return string|null
      */
     public function getExpiryDate()
     {
         return $this->expiryDate;
+    }
+
+    /**
+     * @param string $name
+     * @param string $colour
+     * @param string $originCountry
+     * @param string $originCity
+     * @param string $class
+     * @param string $expiryDate
+     *
+     * @return Fruit
+     */
+    public static function getFruitFromFullInfo(
+        string $name,
+        string $colour = null,
+        string $originCountry = null,
+        string $originCity = null,
+        string $class = null,
+        string $expiryDate = null
+    ) {
+        $fruit = new Fruit($name);
+
+        if (null !== $colour) {
+            $fruit->setColour($colour);
+        }
+
+        if (null !== $originCountry) {
+            $fruit->setOriginCountry($originCountry);
+        }
+
+        if (null !== $originCity) {
+            $fruit->setOriginCity($originCity);
+        }
+
+        if (null !== $class) {
+            $fruit->setClass($class);
+        }
+
+        if (null !== $expiryDate) {
+            $fruit->setExpiryDate($expiryDate);
+        }
+
+        return $fruit;
     }
 }

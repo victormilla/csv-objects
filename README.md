@@ -13,11 +13,11 @@ format can be quite sophisticated, so two examples are provided:
 ### Basic import definition
  
 ```yaml
-name: Fruits definition                              # (Optional) Name of the import definition
-columns:                                             # (Required) An associative array with the headings of the columns in the file that will be imported
-    Name:   { fruit: '#Name#' }                      # 'fruit' is a shortname for the object being created for the list (defined below) and #Name# will be the argument passed to the constructor. The hashes indicate that it should replace it with the value on that column                                         
-    Weight: ~                                        # Null indicates that it can be ignored
-returns: CSVObjects\ImportBundle\Tests\Objects\Fruit # The class of the elements that will be returned 
+name: Fruits definition                                # (Optional) Name of the import definition
+columns:                                               # (Required) An associative array with the headings of the columns in the file that will be imported
+    Name:   { fruit: '#Name#' }                        # 'fruit' is a shortname for the object being created for the list (defined below) and #Name# will be the argument passed to the constructor. The hashes indicate that it should replace it with the value on that column                                         
+    Weight: ~                                          # Null indicates that it can be ignored
+returns: 'CSVObjects\ImportBundle\Tests\Objects\Fruit' # The class of the elements that will be returned 
 ```
 
 ### Full import definition
@@ -37,5 +37,5 @@ columns:
     Expiry date:   { validate: 'date', sourceFormat: 'd/m/Y', format: 'Y-m-d' }                                 # If validate is not an array, it can be an special value. 'date' will check that it is a date. Optionally, you can specify the source format using 'sourceFormat' or reformat it by specifying 'format'
 copy:                                                                                                           # If specified, if will add more columns to the row, copying from the referenced columns before being processed
     Origin - City: Origin
-returns: CSVObjects\ImportBundle\Tests\Objects\Fruit
+returns: ['CSVObjects\ImportBundle\Tests\Objects\Fruit', 'getFruitFromFullInfo']                                # If the return is an array, it will make a static call to the specified method to create the class
 ```

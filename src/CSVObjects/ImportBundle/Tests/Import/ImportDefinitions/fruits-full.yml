@@ -11,4 +11,4 @@ columns:
     Expiry date:   { validate: 'date', sourceFormat: 'd/m/Y', format: 'Y-m-d' }
 copy:
     Origin - City: Origin
-returns: CSVObjects\ImportBundle\Tests\Objects\Fruit
+returns: ['CSVObjects\ImportBundle\Tests\Objects\Fruit', 'getFruitFromFullInfo']

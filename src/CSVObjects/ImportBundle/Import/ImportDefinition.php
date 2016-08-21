@@ -99,7 +99,7 @@ class ImportDefinition
 
         $resolver->setRequired('columns');
         $resolver->setAllowedTypes('name', ['string', 'null']);
-        $resolver->setAllowedTypes('returns', ['string', 'null']);
+        $resolver->setAllowedTypes('returns', ['string', 'array', 'null']);
     }
 
     /**

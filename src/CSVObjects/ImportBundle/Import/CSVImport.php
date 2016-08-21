@@ -18,15 +18,29 @@ class CSVImport
     private $columnNames;
 
     /**
-     * @var ReflectionClass
+     * @var bool
      */
-    private $reflectionClass;
+    private $useRefectionClass;
+
+    /**
+     * @var ReflectionClass|string[]
+     */
+    private $class;
 
     public function __construct(ImportDefinition $definition)
     {
-        $this->definition      = $definition;
-        $this->columnNames     = $definition->getColumnNames();
-        $this->reflectionClass = new ReflectionClass($definition->getClass());
+        $this->definition  = $definition;
+        $this->columnNames = $definition->getColumnNames();
+
+        $class = $definition->getClass();
+
+        if (is_string($class)) {
+            $this->useRefectionClass = true;
+            $this->class             = new ReflectionClass($class);
+        } else {
+            $this->useRefectionClass = false;
+            $this->class             = $class;
+        }
     }
 
     /**
@@ -133,7 +147,9 @@ class CSVImport
         $r = array();
 
         foreach ($this->definition->getArgumentsByData($row) as $instance) {
-            $r[] = $this->reflectionClass->newInstanceArgs($instance);
+            $r[] = $this->useRefectionClass
+                ? $this->class->newInstanceArgs($instance)
+                : call_user_func_array($this->class, $instance);
         }
 
         return $r;
