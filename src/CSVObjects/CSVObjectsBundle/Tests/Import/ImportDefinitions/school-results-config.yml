@@ -1,0 +1,6 @@
+name: School results
+columns:
+    School:  { schoolName-via-config: '#School#' }
+    Student: { studentId-via-config: ['#School#', '#Student#'] }
+    EN:      { result-via-config: ['#Student#', 'EN', '#EN#'] }
+    MA:      { result-via-config: ['#Student#', 'MA', '#MA#'] }

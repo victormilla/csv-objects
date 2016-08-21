@@ -1,0 +1,10 @@
+name: School results
+columns:
+    School:  { schoolName: '#School#' }
+    Student: { studentId: ['#School#', '#Student#'] }
+    EN:      { result: ['#Student#', 'EN', '#EN#'] }
+    MA:      { result: ['#Student#', 'MA', '#MA#'] }
+classes:
+    result:     'CSVObjects\CSVObjectsBundle\Tests\Objects\Result'
+    schoolName: ['CSVObjects\CSVObjectsBundle\Tests\Objects\SchoolRepository', 'findSchoolByName']
+    studentId:  ['CSVObjects\CSVObjectsBundle\Tests\Objects\StudentRepository', 'findStudentById' ]

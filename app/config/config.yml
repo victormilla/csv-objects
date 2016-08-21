@@ -10,3 +10,9 @@ framework:
     secret:          "%secret%"
     validation:      { enable_annotations: true }
     default_locale:  "%locale%"
+
+csv_objects:
+    classes:
+        result-via-config:     'CSVObjects\CSVObjectsBundle\Tests\Objects\Result'
+        schoolName-via-config: ['CSVObjects\CSVObjectsBundle\Tests\Objects\SchoolRepository', 'findSchoolByName']
+        studentId-via-config:  ['CSVObjects\CSVObjectsBundle\Tests\Objects\StudentRepository', 'findStudentById' ]

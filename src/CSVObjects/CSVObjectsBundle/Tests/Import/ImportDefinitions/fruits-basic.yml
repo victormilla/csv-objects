@@ -1,0 +1,7 @@
+# Sample as seen in README.md
+name: Fruits definition
+columns:
+    Name:   { fruit: '#Name#' }
+    Weight: ~
+classes:
+    fruit: 'CSVObjects\CSVObjectsBundle\Tests\Objects\Fruit'
