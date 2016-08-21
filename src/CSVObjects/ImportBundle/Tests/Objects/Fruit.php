@@ -24,16 +24,23 @@ class Fruit
      */
     private $originCity;
 
+    /**
+     * @var string|null
+     */
+    private $class;
+
     public function __construct(
         string $name,
         string $colour = null,
         string $originCountry = null,
-        string $originCity = null
+        string $originCity = null,
+        string $class = null
     ) {
         $this->name          = $name;
         $this->colour        = $colour;
         $this->originCountry = $originCountry;
         $this->originCity    = $originCity;
+        $this->class         = $class;
     }
 
     /**
@@ -66,5 +73,13 @@ class Fruit
     public function getOriginCity()
     {
         return $this->originCity;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getClass()
+    {
+        return $this->class;
     }
 }

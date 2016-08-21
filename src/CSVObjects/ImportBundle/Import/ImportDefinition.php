@@ -45,6 +45,11 @@ class ImportDefinition
      */
     private $maps = array();
 
+    /**
+     * @var string[]
+     */
+    private $extracts = array();
+
     public function __construct(array $definition)
     {
         $resolver = new OptionsResolver();
@@ -141,6 +146,13 @@ class ImportDefinition
             unset($definition['map']);
         }
 
+        // Extract
+        if (isset($definition['extract'])) {
+            $this->extracts[$columnName] = $definition['extract'];
+
+            unset($definition['extract']);
+        }
+
         // Class
         if (1 === count($definition)) {
             // It must be talking about objects.
@@ -193,11 +205,13 @@ class ImportDefinition
     {
         $r = array();
 
-        // Process row validation rules
-        foreach ($this->validations as $validations) {
-            foreach ($validations as $validation) {
-                $validation($row);
-            }
+        // Extract data from value
+        foreach ($this->extracts as $columnName => $extract) {
+            preg_match(sprintf('/%s/', $extract), $row[$columnName], $matches);
+
+            $row[$columnName] = isset($matches[1])
+                ? $matches[1]
+                : null;
         }
 
         // Replace values by their aliases
@@ -205,6 +219,13 @@ class ImportDefinition
             $row[$columnName] = isset($map[$row[$columnName]])
                 ? $map[$row[$columnName]]
                 : null;
+        }
+
+        // Process row validation rules
+        foreach ($this->validations as $validations) {
+            foreach ($validations as $validation) {
+                $validation($row);
+            }
         }
 
         foreach ($this->returnDataColumns as $columnName => $arguments) {

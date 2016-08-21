@@ -23,15 +23,16 @@ returns: CSVObjects\ImportBundle\Tests\Objects\Fruit # The class of the elements
 ### Full import definition
 
 ```yaml
-name: Fruits definition                             
+name: Fruits definition
 columns:
-    File Version:  { expect: 38 }                                                    # (Optional) Expects indicates that the row value must always be as stated
-    Name:          { fruit: ['#Name#', '#Colour#', '#Origin#', '#Origin - City#'] }  # The constructor now takes three arguments
+    File Version:  { expect: 38 }                                                              # (Optional) Expects indicates that the row value must always be as stated
+    Name:          { fruit: ['#Name#', '#Colour#', '#Origin#', '#Origin - City#', '#Class#'] } # The constructor now takes three arguments
     Weight:        ~
-    Colour:        { validate: ['red', 'yellow'] }                                   # (Optional) Valid values that this column could have
-    Origin:        { map: { 'Granada': 'Spain', 'Malaga': 'Spain', 'Dover': 'UK' } } # (Optional) It will apply this alias to the data on this column. If no validate is provided, non-matching values will convert into null
+    Colour:        { validate: ['red', 'yellow'] }                                             # (Optional) Valid values that this column could have
+    Origin:        { map: { 'Granada': 'Spain', 'Malaga': 'Spain', 'Dover': 'UK' } }           # (Optional) It will apply this alias to the data on this column. If no validate is provided, non-matching values will convert into null
     Origin - City: ~
-copy:                                                                               # (Optional) If specified, if will add more columns to the row, copying from the referenced columns before being processed
+    Class:         { extract: 'Class (.*)', validate: ['A+', 'A', 'B', 'C'] }                  # (Optional) It is like mapping but using the expecified regular expression to do the conversion. The desired part must be in brackets. Functions can optionally be combined when required
+copy:                                                                                          # (Optional) If specified, if will add more columns to the row, copying from the referenced columns before being processed
     Origin - City: Origin
 returns: CSVObjects\ImportBundle\Tests\Objects\Fruit
 ```

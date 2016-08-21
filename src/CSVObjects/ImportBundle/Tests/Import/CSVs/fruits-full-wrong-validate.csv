@@ -1,4 +1,4 @@
-File Version,Name,Weight,Colour,Origin
-38,Apple,2,red,Dover
-38,Pineapple,3,black,Malaga
-38,Banana,1,yellow,Granada
+File Version,Name,Weight,Colour,Origin,Class
+38,Apple,2,red,Dover,Class A+
+38,Pineapple,3,black,Malaga,Class B
+38,Banana,1,yellow,Granada,Class A

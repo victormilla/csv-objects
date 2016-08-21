@@ -175,4 +175,21 @@ class ImportTest extends KernelTestCase
         $this->assertEquals('Malaga', $pineapple->getOriginCity());
         $this->assertEquals('Granada', $banana->getOriginCity());
     }
+
+    public function testExtract()
+    {
+        $definition = new ImportDefinition(Yaml::parse(file_get_contents(__DIR__ . '/ImportDefinitions/fruits-full.yml')));
+        $file       = __DIR__ . '/CSVs/fruits-full.csv';
+        $fruits     = CSVImport::import($definition, $file);
+
+        /** @var Fruit[] $fruits */
+
+        $apple     = $fruits[0];
+        $pineapple = $fruits[1];
+        $banana    = $fruits[2];
+
+        $this->assertEquals('A+', $apple->getClass());
+        $this->assertEquals('B', $pineapple->getClass());
+        $this->assertEquals('A', $banana->getClass());
+    }
 }
