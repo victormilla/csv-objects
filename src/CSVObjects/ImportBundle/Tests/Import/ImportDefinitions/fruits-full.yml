@@ -1,9 +1,12 @@
 # Sample as seen in README.md
 name: Fruits definition
 columns:
-    File Version: { expect: '38' }
-    Name:         { fruit: ['#Name#', '#Colour#', '#Origin#'] }
-    Weight:       ~
-    Colour:       { validate: ['red', 'yellow'] }
-    Origin:       { map: { 'Granada': 'Spain', 'Malaga': 'Spain', 'Dover': 'UK' } }
+    File Version:  { expect: '38' }
+    Name:          { fruit: ['#Name#', '#Colour#', '#Origin#', '#Origin - City#'] }
+    Weight:        ~
+    Colour:        { validate: ['red', 'yellow'] }
+    Origin:        { map: { 'Granada': 'Spain', 'Malaga': 'Spain', 'Dover': 'UK' } }
+    Origin - City: ~
+copy:
+    Origin - City: Origin
 returns: CSVObjects\ImportBundle\Tests\Objects\Fruit

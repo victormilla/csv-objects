@@ -36,4 +36,11 @@ class ImportDefinitionTest extends KernelTestCase
         $this->assertEquals('Fruits definition', $importDefinition->getName());
         $this->assertEquals('CSVObjects\ImportBundle\Tests\Objects\Fruit', $importDefinition->getClass());
     }
+
+    public function testColumnCopy()
+    {
+        $importDefinition = new ImportDefinition(Yaml::parse(file_get_contents(__DIR__ . '/ImportDefinitions/fruits-full.yml')));
+
+        $this->assertContains('Origin - City', $importDefinition->getColumnNames());
+    }
 }

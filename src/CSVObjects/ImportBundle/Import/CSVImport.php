@@ -52,6 +52,7 @@ class CSVImport
     {
         $data = $this->readFile($file);
 
+        $this->addColumnCopies($data);
         $this->validate($data);
 
         $headings = $data[0];
@@ -73,8 +74,7 @@ class CSVImport
      */
     private function readFile(File $file)
     {
-        $data = array();
-
+        $data      = array();
         $extension = strtolower($file->getExtension());
 
         if (!in_array($extension, ['csv', 'xlsx'])) {
@@ -137,5 +137,37 @@ class CSVImport
         }
 
         return $r;
+    }
+
+    /**
+     * @param array $data
+     */
+    private function addColumnCopies(array &$data)
+    {
+        if (!isset($data[0])) {
+            return;
+        }
+
+        $headings = array_flip($data[0]);
+
+        foreach ($this->definition->getColumnCopies() as $newColumnName => $columnName) {
+            if (!isset($headings[$columnName])) {
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'The description said to copy the column \'%s\' from the column \'%s\', but it doesn\'t exist on the file.',
+                        $newColumnName,
+                        $columnName
+                    )
+                );
+            }
+
+            // Headings
+            $data[0][] = $newColumnName;
+
+            // Data
+            for ($i = 1; $i < count($data); $i++) {
+                $data[$i][] = $data[$i][$headings[$columnName]];
+            }
+        }
     }
 }

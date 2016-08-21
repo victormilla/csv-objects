@@ -77,6 +77,7 @@ class ImportDefinition
                 'name'    => null,
                 'columns' => [],
                 'returns' => null,
+                'copy'    => [],
             ]
         );
 
@@ -244,7 +245,7 @@ class ImportDefinition
         foreach ($matches[0] as $match) {
             $search       = substr($match, 1, -1);
             $originalType = gettype($row[$search]);
-            $argument = str_replace(sprintf('%s%s%s', self::COLUMN_DELIMITER, $search, self::COLUMN_DELIMITER), $row[$search], $argument);
+            $argument     = str_replace(sprintf('%s%s%s', self::COLUMN_DELIMITER, $search, self::COLUMN_DELIMITER), $row[$search], $argument);
 
             // Restore the original data type
             switch ($originalType) {
@@ -268,5 +269,13 @@ class ImportDefinition
         }
 
         return $argument;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getColumnCopies()
+    {
+        return $this->options['copy'];
     }
 }

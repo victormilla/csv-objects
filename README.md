@@ -25,10 +25,13 @@ returns: CSVObjects\ImportBundle\Tests\Objects\Fruit # The class of the elements
 ```yaml
 name: Fruits definition                             
 columns:
-    File Version: { expect: 38 }                                                    # (Optional) Expects indicates that the row value must always be as stated
-    Name:         { fruit: ['#Name#', '#Colour#', '#Origin#'] }                     # The constructor now takes three arguments
-    Weight:       ~
-    Colour:       { validate: ['red', 'yellow'] }                                   # (Optional) Valid values that this column could have
-    Origin:       { map: { 'Granada': 'Spain', 'Malaga': 'Spain', 'Dover': 'UK' } } # (Optional) It will apply this alias to the data on this column. If no validate is provided, non-matching values will convert into null
+    File Version:  { expect: 38 }                                                    # (Optional) Expects indicates that the row value must always be as stated
+    Name:          { fruit: ['#Name#', '#Colour#', '#Origin#', '#Origin - City#'] }  # The constructor now takes three arguments
+    Weight:        ~
+    Colour:        { validate: ['red', 'yellow'] }                                   # (Optional) Valid values that this column could have
+    Origin:        { map: { 'Granada': 'Spain', 'Malaga': 'Spain', 'Dover': 'UK' } } # (Optional) It will apply this alias to the data on this column. If no validate is provided, non-matching values will convert into null
+    Origin - City: ~
+copy:                                                                               # (Optional) If specified, if will add more columns to the row, copying from the referenced columns before being processed
+    Origin - City: Origin
 returns: CSVObjects\ImportBundle\Tests\Objects\Fruit
 ```

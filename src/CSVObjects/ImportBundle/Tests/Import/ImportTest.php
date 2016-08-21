@@ -107,10 +107,6 @@ class ImportTest extends KernelTestCase
         $this->assertEquals('red', $apple->getColour());
         $this->assertEquals('yellow', $pineapple->getColour());
         $this->assertEquals('yellow', $banana->getColour());
-
-        $this->assertEquals('UK', $apple->getOriginCountry());
-        $this->assertEquals('Spain', $pineapple->getOriginCountry());
-        $this->assertEquals('Spain', $pineapple->getOriginCountry());
     }
 
     /**
@@ -144,5 +140,39 @@ class ImportTest extends KernelTestCase
         /** @var Fruit $banana */
 
         $this->assertNull($banana->getOriginCountry());
+    }
+
+    public function testColumnMapping()
+    {
+        $definition = new ImportDefinition(Yaml::parse(file_get_contents(__DIR__ . '/ImportDefinitions/fruits-full.yml')));
+        $file       = __DIR__ . '/CSVs/fruits-full.csv';
+        $fruits     = CSVImport::import($definition, $file);
+
+        /** @var Fruit[] $fruits */
+
+        $apple     = $fruits[0];
+        $pineapple = $fruits[1];
+        $banana    = $fruits[2];
+
+        $this->assertEquals('UK', $apple->getOriginCountry());
+        $this->assertEquals('Spain', $pineapple->getOriginCountry());
+        $this->assertEquals('Spain', $banana->getOriginCountry());
+    }
+
+    public function testColumnCopy()
+    {
+        $definition = new ImportDefinition(Yaml::parse(file_get_contents(__DIR__ . '/ImportDefinitions/fruits-full.yml')));
+        $file       = __DIR__ . '/CSVs/fruits-full.csv';
+        $fruits     = CSVImport::import($definition, $file);
+
+        /** @var Fruit[] $fruits */
+
+        $apple     = $fruits[0];
+        $pineapple = $fruits[1];
+        $banana    = $fruits[2];
+
+        $this->assertEquals('Dover', $apple->getOriginCity());
+        $this->assertEquals('Malaga', $pineapple->getOriginCity());
+        $this->assertEquals('Granada', $banana->getOriginCity());
     }
 }
