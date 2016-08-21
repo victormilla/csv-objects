@@ -131,6 +131,17 @@ class ImportTest extends KernelTestCase
         CSVImport::import($definition, $file);
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testDateValidation()
+    {
+        $definition = new ImportDefinition(Yaml::parse(file_get_contents(__DIR__ . '/ImportDefinitions/fruits-full.yml')));
+        $file       = __DIR__ . '/CSVs/fruits-full-wrong-validate-date.csv';
+
+        CSVImport::import($definition, $file);
+    }
+
     public function testUnmappedValue()
     {
         $definition = new ImportDefinition(Yaml::parse(file_get_contents(__DIR__ . '/ImportDefinitions/fruits-full.yml')));
@@ -191,5 +202,22 @@ class ImportTest extends KernelTestCase
         $this->assertEquals('A+', $apple->getClass());
         $this->assertEquals('B', $pineapple->getClass());
         $this->assertEquals('A', $banana->getClass());
+    }
+
+    public function testDateFormatting()
+    {
+        $definition = new ImportDefinition(Yaml::parse(file_get_contents(__DIR__ . '/ImportDefinitions/fruits-full.yml')));
+        $file       = __DIR__ . '/CSVs/fruits-full.csv';
+        $fruits     = CSVImport::import($definition, $file);
+
+        /** @var Fruit[] $fruits */
+
+        $apple     = $fruits[0];
+        $pineapple = $fruits[1];
+        $banana    = $fruits[2];
+
+        $this->assertEquals('2015-02-11', $apple->getExpiryDate());
+        $this->assertEquals('2016-09-16', $pineapple->getExpiryDate());
+        $this->assertEquals('2016-09-08', $banana->getExpiryDate());
     }
 }

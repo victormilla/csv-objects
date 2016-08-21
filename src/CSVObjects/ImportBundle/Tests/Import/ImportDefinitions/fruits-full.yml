@@ -2,12 +2,13 @@
 name: Fruits definition
 columns:
     File Version:  { expect: '38' }
-    Name:          { fruit: ['#Name#', '#Colour#', '#Origin#', '#Origin - City#', '#Class#'] }
+    Name:          { fruit: ['#Name#', '#Colour#', '#Origin#', '#Origin - City#', '#Class#', '#Expiry date#'] }
     Weight:        ~
     Colour:        { validate: ['red', 'yellow'] }
     Origin:        { map: { 'Granada': 'Spain', 'Malaga': 'Spain', 'Dover': 'UK' } }
     Origin - City: ~
     Class:         { extract: 'Class (.*)', validate: ['A+', 'A', 'B', 'C'] }
+    Expiry date:   { validate: 'date', sourceFormat: 'd/m/Y', format: 'Y-m-d' }
 copy:
     Origin - City: Origin
 returns: CSVObjects\ImportBundle\Tests\Objects\Fruit

@@ -29,18 +29,25 @@ class Fruit
      */
     private $class;
 
+    /**
+     * @var string|null
+     */
+    private $expiryDate;
+
     public function __construct(
         string $name,
         string $colour = null,
         string $originCountry = null,
         string $originCity = null,
-        string $class = null
+        string $class = null,
+        string $expiryDate = null
     ) {
         $this->name          = $name;
         $this->colour        = $colour;
         $this->originCountry = $originCountry;
         $this->originCity    = $originCity;
         $this->class         = $class;
+        $this->expiryDate    = $expiryDate;
     }
 
     /**
@@ -81,5 +88,13 @@ class Fruit
     public function getClass()
     {
         return $this->class;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getExpiryDate()
+    {
+        return $this->expiryDate;
     }
 }

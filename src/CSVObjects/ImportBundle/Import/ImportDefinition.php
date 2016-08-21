@@ -3,6 +3,7 @@
 namespace CSVObjects\ImportBundle\Import;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\DateTime;
 
 class ImportDefinition
 {
@@ -49,6 +50,16 @@ class ImportDefinition
      * @var string[]
      */
     private $extracts = array();
+
+    /**
+     * @var string[]
+     */
+    private $dateSourceFormat = array();
+
+    /**
+     * @var string[]
+     */
+    private $dateFormat = array();
 
     public function __construct(array $definition)
     {
@@ -121,20 +132,59 @@ class ImportDefinition
 
         // Validate
         if (isset($definition['validate'])) {
-            $validValues = $definition['validate'];
+            $validation = $definition['validate'];
 
-            $this->validations[$columnName][] = function ($row) use ($columnName, $validValues) {
-                if (!in_array($row[$columnName], $validValues, true)) {
-                    throw new \InvalidArgumentException(
-                        sprintf(
-                            'The column \'%s\' is expected to have one of these values: (%s). However, there is a row there the value is \'%s\' which is not on the list',
-                            $columnName,
-                            json_encode($validValues),
-                            $row[$columnName]
-                        )
-                    );
+            if (is_array($validation)) {
+                $this->validations[$columnName][] = function ($row) use ($columnName, $validation) {
+                    if (!in_array($row[$columnName], $validation, true)) {
+                        throw new \InvalidArgumentException(
+                            sprintf(
+                                'The column \'%s\' is expected to have one of these values: (%s). However, there is a row there the value is \'%s\' which is not on the list',
+                                $columnName,
+                                json_encode($validation),
+                                $row[$columnName]
+                            )
+                        );
+                    }
+                };
+            } elseif ('date' === $validation) {
+                $sourceFormat = isset($definition['sourceFormat'])
+                    ? $definition['sourceFormat']
+                    : null;
+
+                if (null !== $sourceFormat) {
+                    $this->dateSourceFormat[$columnName] = $sourceFormat;
                 }
-            };
+
+                if (isset($definition['format'])) {
+                    $this->dateFormat[$columnName] = $definition['format'];
+                    $sourceFormat                  = $definition['format'];
+                }
+
+                unset($definition['sourceFormat'], $definition['format']);
+
+                $this->validations[$columnName][] = function ($row) use ($columnName, $validation, $sourceFormat) {
+                    try {
+                        $date = null === $sourceFormat
+                            ? new \DateTime($row[$columnName])
+                            : \DateTime::createFromFormat($sourceFormat, $row[$columnName]);
+
+                        if (false === $date) {
+                            throw new \Exception();
+                        }
+                    } catch (\Exception $caught) {
+                        throw new \InvalidArgumentException(
+                            sprintf(
+                                'The column \'%s\' is expected to be a date. However, there is a row there the value is \'%s\' which is not valid (or valid in the specified format)',
+                                $columnName,
+                                $row[$columnName]
+                            )
+                        );
+                    }
+                };
+            } else {
+                throw new \InvalidArgumentException('Unknown validation rule: ' . $validation);
+            }
 
             unset($definition['validate']);
         }
@@ -204,6 +254,23 @@ class ImportDefinition
     public function getArgumentsByData(array $row)
     {
         $r = array();
+
+        // Date reformat
+        foreach ($this->dateFormat as $columnName => $format) {
+            try {
+                $date = !isset($this->dateSourceFormat[$columnName])
+                    ? new \DateTime($row[$columnName])
+                    : \DateTime::createFromFormat($this->dateSourceFormat[$columnName], $row[$columnName]);
+
+                if (false === $date || 0 < \DateTime::getLastErrors()['warning_count']) {
+                    throw new \Exception();
+                }
+
+                $row[$columnName] = $date->format($format);
+            } catch (\Exception $caught) {
+                // Do nothing
+            }
+        }
 
         // Extract data from value
         foreach ($this->extracts as $columnName => $extract) {
