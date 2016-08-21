@@ -7,3 +7,9 @@ framework:
         storage_id: session.storage.mock_file
     profiler:
         collect: false
+
+csv_objects:
+    classes:
+        result-via-config:     'CSVObjects\CSVObjectsBundle\Tests\Objects\Result'
+        schoolName-via-config: ['@csv_objects.tests.school_repository', 'findSchoolByName']
+        studentId-via-config:  ['@csv_objects.tests.student_repository', 'findStudentById' ]
