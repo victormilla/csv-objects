@@ -3,3 +3,9 @@ services:
         class: CSVObjects\CSVObjectsBundle\Import\ImportManager
         arguments:
             - '@service_container'
+
+    csv_objects.tests.school_repository:
+        class: CSVObjects\CSVObjectsBundle\Tests\Repositories\SchoolRepository
+
+    csv_objects.tests.student_repository:
+        class: CSVObjects\CSVObjectsBundle\Tests\Repositories\StudentRepository

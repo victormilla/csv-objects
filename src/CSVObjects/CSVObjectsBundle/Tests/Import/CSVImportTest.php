@@ -7,9 +7,9 @@ use CSVObjects\CSVObjectsBundle\Tests\Objects\Contract;
 use CSVObjects\CSVObjectsBundle\Tests\Objects\Fruit;
 use CSVObjects\CSVObjectsBundle\Tests\Objects\Result;
 use CSVObjects\CSVObjectsBundle\Tests\Objects\School;
-use CSVObjects\CSVObjectsBundle\Tests\Objects\SchoolRepository;
 use CSVObjects\CSVObjectsBundle\Tests\Objects\Student;
-use CSVObjects\CSVObjectsBundle\Tests\Objects\StudentRepository;
+use CSVObjects\CSVObjectsBundle\Tests\StaticRepositories\StaticSchoolRepository;
+use CSVObjects\CSVObjectsBundle\Tests\StaticRepositories\StaticStudentRepository;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Yaml\Yaml;
 
@@ -20,19 +20,19 @@ class CSVImportTest extends KernelTestCase
         $stJohns    = new School('St John\'s School');
         $lighthouse = new School('Lighthouse Academy');
 
-        SchoolRepository::addSchool($stJohns);
-        SchoolRepository::addSchool($lighthouse);
+        StaticSchoolRepository::addSchool($stJohns);
+        StaticSchoolRepository::addSchool($lighthouse);
 
-        StudentRepository::addStudent(new Student($stJohns, 1));
-        StudentRepository::addStudent(new Student($stJohns, 2));
-        StudentRepository::addStudent(new Student($lighthouse, 1));
+        StaticStudentRepository::addStudent(new Student($stJohns, 1));
+        StaticStudentRepository::addStudent(new Student($stJohns, 2));
+        StaticStudentRepository::addStudent(new Student($lighthouse, 1));
     }
 
     public function testEnvironment()
     {
-        $this->assertCount(2, SchoolRepository::getAllSchools(), 'There were two schools expected');
-        $this->assertCount(2, StudentRepository::getAllStudentsInSchool('St John\'s School'), 'There were two students expected in St John\'s');
-        $this->assertCount(1, StudentRepository::getAllStudentsInSchool('Lighthouse Academy'), 'There was one student expected in Farewell');
+        $this->assertCount(2, StaticSchoolRepository::getAllSchools(), 'There were two schools expected');
+        $this->assertCount(2, StaticStudentRepository::getAllStudentsInSchool('St John\'s School'), 'There were two students expected in St John\'s');
+        $this->assertCount(1, StaticStudentRepository::getAllStudentsInSchool('Lighthouse Academy'), 'There was one student expected in Farewell');
     }
 
     public function testFruitsSimple()

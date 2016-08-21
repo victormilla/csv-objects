@@ -3,6 +3,7 @@
 namespace CSVObjects\CSVObjectsBundle\Import;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\File\File;
 
 class ImportManager
 {
@@ -44,6 +45,11 @@ class ImportManager
 
         $definition['classes'] = array_merge($definition['classes'], $this->configClasses);
 
-        return CSVImport::import($definition, $filename);
+        $import = new CSVImport(new ImportDefinition($definition));
+        $file   = new File($filename);
+
+        $import->setContainer($this->container);
+
+        return $import->extractResultsFromFile($file);
     }
 }

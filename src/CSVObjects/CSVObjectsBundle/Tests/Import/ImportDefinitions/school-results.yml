@@ -6,5 +6,5 @@ columns:
     MA:      { result: ['#Student#', 'MA', '#MA#'] }
 classes:
     result:     'CSVObjects\CSVObjectsBundle\Tests\Objects\Result'
-    schoolName: ['CSVObjects\CSVObjectsBundle\Tests\Objects\SchoolRepository', 'findSchoolByName']
-    studentId:  ['CSVObjects\CSVObjectsBundle\Tests\Objects\StudentRepository', 'findStudentById' ]
+    schoolName: ['CSVObjects\CSVObjectsBundle\Tests\StaticRepositories\StaticSchoolRepository', 'findSchoolByName']
+    studentId:  ['CSVObjects\CSVObjectsBundle\Tests\StaticRepositories\StaticStudentRepository', 'findStudentById' ]

@@ -3,9 +3,7 @@
 namespace CSVObjects\CSVObjectsBundle\Tests\Import;
 
 use CSVObjects\CSVObjectsBundle\Tests\Objects\School;
-use CSVObjects\CSVObjectsBundle\Tests\Objects\SchoolRepository;
 use CSVObjects\CSVObjectsBundle\Tests\Objects\Student;
-use CSVObjects\CSVObjectsBundle\Tests\Objects\StudentRepository;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Yaml\Yaml;
@@ -26,12 +24,15 @@ class ImportManagerTest extends KernelTestCase
         $stJohns    = new School('St John\'s School');
         $lighthouse = new School('Lighthouse Academy');
 
-        SchoolRepository::addSchool($stJohns);
-        SchoolRepository::addSchool($lighthouse);
+        $schoolRepository = $this->container->get('csv_objects.tests.school_repository');
+        $studentRepository = $this->container->get('csv_objects.tests.student_repository');
 
-        StudentRepository::addStudent(new Student($stJohns, 1));
-        StudentRepository::addStudent(new Student($stJohns, 2));
-        StudentRepository::addStudent(new Student($lighthouse, 1));
+        $schoolRepository->addSchool($stJohns);
+        $schoolRepository->addSchool($lighthouse);
+
+        $studentRepository->addStudent(new Student($stJohns, 1));
+        $studentRepository->addStudent(new Student($stJohns, 2));
+        $studentRepository->addStudent(new Student($lighthouse, 1));
     }
 
     public function testFruitsSimple()

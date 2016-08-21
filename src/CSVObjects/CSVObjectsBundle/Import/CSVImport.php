@@ -3,6 +3,7 @@
 namespace CSVObjects\CSVObjectsBundle\Import;
 
 use CSVObjects\CSVObjectsBundle\ObjectProcurer\ObjectProcurer;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\File\File;
 
 class CSVImport
@@ -54,7 +55,7 @@ class CSVImport
      *
      * @return array
      */
-    private function extractResultsFromFile(File $file)
+    public function extractResultsFromFile(File $file)
     {
         $data = $this->readFile($file);
 
@@ -174,6 +175,16 @@ class CSVImport
             for ($i = 1; $i < count($data); $i++) {
                 $data[$i][] = $data[$i][$headings[$columnName]];
             }
+        }
+    }
+
+    /**
+     * @param ContainerInterface $container
+     */
+    public function setContainer(ContainerInterface $container)
+    {
+        foreach ($this->classes as $class) {
+            $class->setContainer($container);
         }
     }
 }

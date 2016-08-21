@@ -1,8 +1,10 @@
 <?php
 
-namespace CSVObjects\CSVObjectsBundle\Tests\Objects;
+namespace CSVObjects\CSVObjectsBundle\Tests\StaticRepositories;
 
-class SchoolRepository
+use CSVObjects\CSVObjectsBundle\Tests\Objects\School;
+
+class StaticSchoolRepository
 {
     /**
      * @var School[]
