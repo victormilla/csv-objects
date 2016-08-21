@@ -4,6 +4,7 @@ namespace CSVObjects\ImportBundle\Tests\Import;
 
 use CSVObjects\ImportBundle\Import\CSVImport;
 use CSVObjects\ImportBundle\Import\ImportDefinition;
+use CSVObjects\ImportBundle\Tests\Objects\Contract;
 use CSVObjects\ImportBundle\Tests\Objects\Fruit;
 use CSVObjects\ImportBundle\Tests\Objects\School;
 use CSVObjects\ImportBundle\Tests\Objects\Student;
@@ -70,7 +71,7 @@ class ImportTest extends KernelTestCase
         $this->assertCount(3, $fruits);
 
         foreach ($fruits as $fruit) {
-            $this->assertInstanceOf('CSVObjects\ImportBundle\Tests\Objects\Fruit', $fruit);
+            $this->assertInstanceOf(Fruit::class, $fruit);
         }
 
         $apple     = $fruits[0];
@@ -93,7 +94,7 @@ class ImportTest extends KernelTestCase
         $this->assertCount(3, $fruits);
 
         foreach ($fruits as $fruit) {
-            $this->assertInstanceOf('CSVObjects\ImportBundle\Tests\Objects\Fruit', $fruit);
+            $this->assertInstanceOf(Fruit::class, $fruit);
         }
 
         $apple     = $fruits[0];
@@ -219,5 +220,20 @@ class ImportTest extends KernelTestCase
         $this->assertEquals('2015-02-11', $apple->getExpiryDate());
         $this->assertEquals('2016-09-16', $pineapple->getExpiryDate());
         $this->assertEquals('2016-09-08', $banana->getExpiryDate());
+    }
+
+    public function testMappedObject()
+    {
+        $definition = new ImportDefinition(Yaml::parse(file_get_contents(__DIR__ . '/ImportDefinitions/fruits-full.yml')));
+        $file       = __DIR__ . '/CSVs/fruits-full.csv';
+        $fruits     = CSVImport::import($definition, $file);
+
+        /** @var Fruit[] $fruits */
+
+        $apple     = $fruits[0];
+        $pineapple = $fruits[1];
+        $banana    = $fruits[2];
+
+        $this->assertInstanceOf(Contract::class, $apple->getContract());
     }
 }

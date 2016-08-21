@@ -3,4 +3,5 @@ name: Fruits definition
 columns:
     Name:   { fruit: '#Name#' }
     Weight: ~
-returns: CSVObjects\ImportBundle\Tests\Objects\Fruit
+classes:
+    fruit: 'CSVObjects\ImportBundle\Tests\Objects\Fruit'

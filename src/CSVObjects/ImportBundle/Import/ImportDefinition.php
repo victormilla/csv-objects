@@ -2,8 +2,8 @@
 
 namespace CSVObjects\ImportBundle\Import;
 
+use CSVObjects\ImportBundle\ObjectProcurer\ObjectProcurer;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\DateTime;
 
 class ImportDefinition
 {
@@ -25,11 +25,14 @@ class ImportDefinition
     private $columns;
 
     /**
-     * Known classes alias
-     *
-     * @var string[]
+     * @var ObjectProcurer[]
      */
     private $classes;
+
+    /**
+     * @var string
+     */
+    private $returnClass;
 
     /**
      * @var string[]
@@ -61,6 +64,11 @@ class ImportDefinition
      */
     private $dateFormat = array();
 
+    /**
+     * @var ObjectProcurer[]
+     */
+    private $objectProcurers = array();
+
     public function __construct(array $definition)
     {
         $resolver = new OptionsResolver();
@@ -71,6 +79,20 @@ class ImportDefinition
 
         if (0 === count($this->options['columns'])) {
             throw new \InvalidArgumentException('An import definition must contain at least one column');
+        }
+
+        $classes = $this->options['classes'];
+
+        if (0 === count($classes)) {
+            throw new \InvalidArgumentException('The return class must be specified inside classes');
+        }
+
+        reset($classes);
+
+        $this->returnClass = key($classes);
+
+        foreach ($classes as $classAlias => $classDefinition) {
+            $this->classes[$classAlias] = new ObjectProcurer($classDefinition);
         }
 
         foreach ($this->options['columns'] as $columnName => $columnDefinition) {
@@ -92,14 +114,14 @@ class ImportDefinition
             [
                 'name'    => null,
                 'columns' => [],
-                'returns' => null,
+                'classes' => [],
                 'copy'    => [],
             ]
         );
 
         $resolver->setRequired('columns');
         $resolver->setAllowedTypes('name', ['string', 'null']);
-        $resolver->setAllowedTypes('returns', ['string', 'array', 'null']);
+        $resolver->setAllowedTypes('classes', ['array']);
     }
 
     /**
@@ -203,20 +225,24 @@ class ImportDefinition
             unset($definition['extract']);
         }
 
-        // Class
-        if (1 === count($definition)) {
-            // It must be talking about objects.
+        // Mapped Class
+        foreach ($this->classes as $mappedClassName => $mappedClass) {
+            if ($mappedClassName !== $this->returnClass && isset($definition[$mappedClassName])) {
+                $this->objectProcurers[$columnName] = $mappedClass;
 
-            $classAlias = key($definition);
-            $arguments  = end($definition);
-
-            if (isset($this->classes[$classAlias])) {
-                // TODO
-            } else {
-                // It is the return class
-
-                $this->returnDataColumns[$columnName] = $arguments;
+                unset($definition[$mappedClassName]);
             }
+        }
+
+        // Return Class
+        if (isset($definition[$this->returnClass])) {
+            $this->returnDataColumns[$columnName] = $definition[$this->returnClass];
+
+            unset($definition[$this->returnClass]);
+        }
+
+        if (0 !== count($definition)) {
+            throw new \InvalidArgumentException('Something is not right as there is something left on the definition that is not recognised: ' . json_encode($definition));
         }
 
         return true;
@@ -231,11 +257,19 @@ class ImportDefinition
     }
 
     /**
+     * @return ObjectProcurer[]
+     */
+    public function getClasses()
+    {
+        return $this->classes;
+    }
+
+    /**
      * @return string
      */
-    public function getClass()
+    public function getReturnClass()
     {
-        return $this->options['returns'];
+        return $this->returnClass;
     }
 
     /**
@@ -295,6 +329,11 @@ class ImportDefinition
             }
         }
 
+        // Convert relevant columns to objects
+        foreach ($this->objectProcurers as $columnName => $objectProcurer) {
+            $row[$columnName] = $objectProcurer->procure($row[$columnName]);
+        }
+
         foreach ($this->returnDataColumns as $columnName => $arguments) {
             $args = [];
 
@@ -333,7 +372,13 @@ class ImportDefinition
         foreach ($matches[0] as $match) {
             $search       = substr($match, 1, -1);
             $originalType = gettype($row[$search]);
-            $argument     = str_replace(sprintf('%s%s%s', self::COLUMN_DELIMITER, $search, self::COLUMN_DELIMITER), $row[$search], $argument);
+
+            if ('object' === $originalType) {
+                $argument = $row[$search];
+                break;
+            }
+
+            $argument = str_replace(sprintf('%s%s%s', self::COLUMN_DELIMITER, $search, self::COLUMN_DELIMITER), $row[$search], $argument);
 
             // Restore the original data type
             switch ($originalType) {

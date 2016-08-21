@@ -34,6 +34,11 @@ class Fruit
      */
     private $expiryDate;
 
+    /**
+     * @var Contract|null
+     */
+    private $contract;
+
     public function __construct(string $name)
     {
         $this->name = $name;
@@ -128,12 +133,29 @@ class Fruit
     }
 
     /**
-     * @param string $name
-     * @param string $colour
-     * @param string $originCountry
-     * @param string $originCity
-     * @param string $class
-     * @param string $expiryDate
+     * @return Contract|null
+     */
+    public function getContract()
+    {
+        return $this->contract;
+    }
+
+    /**
+     * @param Contract $contract
+     */
+    public function setContract(Contract $contract)
+    {
+        $this->contract = $contract;
+    }
+
+    /**
+     * @param string   $name
+     * @param string   $colour
+     * @param string   $originCountry
+     * @param string   $originCity
+     * @param string   $class
+     * @param string   $expiryDate
+     * @param Contract $contract
      *
      * @return Fruit
      */
@@ -143,7 +165,8 @@ class Fruit
         string $originCountry = null,
         string $originCity = null,
         string $class = null,
-        string $expiryDate = null
+        string $expiryDate = null,
+        Contract $contract = null
     ) {
         $fruit = new Fruit($name);
 
@@ -165,6 +188,10 @@ class Fruit
 
         if (null !== $expiryDate) {
             $fruit->setExpiryDate($expiryDate);
+        }
+
+        if (null !== $contract) {
+            $fruit->setContract($contract);
         }
 
         return $fruit;

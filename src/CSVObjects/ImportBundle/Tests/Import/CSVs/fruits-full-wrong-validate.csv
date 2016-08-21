@@ -1,4 +1,4 @@
-File Version,Name,Weight,Colour,Origin,Class,Expiry date
-38,Apple,2,red,Dover,Class A+,11/02/2015
-38,Pineapple,3,black,Malaga,Class B,16/09/2016
-38,Banana,1,yellow,Granada,Class A,08/09/2016
+File Version,Name,Weight,Colour,Origin,Class,Expiry date,Contract
+38,Apple,2,red,Dover,Class A+,11/02/2015,4512
+38,Pineapple,3,black,Malaga,Class B,16/09/2016,827
+38,Banana,1,yellow,Granada,Class A,08/09/2016,9184

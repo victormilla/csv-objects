@@ -2,7 +2,7 @@
 
 namespace CSVObjects\ImportBundle\Import;
 
-use ReflectionClass;
+use CSVObjects\ImportBundle\ObjectProcurer\ObjectProcurer;
 use Symfony\Component\HttpFoundation\File\File;
 
 class CSVImport
@@ -18,29 +18,21 @@ class CSVImport
     private $columnNames;
 
     /**
-     * @var bool
+     * @var string
      */
-    private $useRefectionClass;
+    private $returnClass;
 
     /**
-     * @var ReflectionClass|string[]
+     * @var ObjectProcurer[]
      */
-    private $class;
+    private $classes;
 
     public function __construct(ImportDefinition $definition)
     {
         $this->definition  = $definition;
         $this->columnNames = $definition->getColumnNames();
-
-        $class = $definition->getClass();
-
-        if (is_string($class)) {
-            $this->useRefectionClass = true;
-            $this->class             = new ReflectionClass($class);
-        } else {
-            $this->useRefectionClass = false;
-            $this->class             = $class;
-        }
+        $this->classes     = $definition->getClasses();
+        $this->returnClass = $definition->getReturnClass();
     }
 
     /**
@@ -147,9 +139,7 @@ class CSVImport
         $r = array();
 
         foreach ($this->definition->getArgumentsByData($row) as $instance) {
-            $r[] = $this->useRefectionClass
-                ? $this->class->newInstanceArgs($instance)
-                : call_user_func_array($this->class, $instance);
+            $r[] = $this->classes[$this->returnClass]->procure($instance);
         }
 
         return $r;
