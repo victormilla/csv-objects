@@ -4,22 +4,34 @@ namespace CSVObjects\CSVObjectsBundle\Tests\Import;
 
 use CSVObjects\CSVObjectsBundle\Tests\Objects\School;
 use CSVObjects\CSVObjectsBundle\Tests\Objects\Student;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Yaml;
 
-class ImportManagerTest extends KernelTestCase
+class ImportManagerTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var ContainerInterface
      */
     private $container;
 
+    private $kernel;
+
+    private $cacheDir;
+
+
     protected function setUp()
     {
-        self::bootKernel();
+        $this->cacheDir = __DIR__.'/../../Resources/cache';
+        if (file_exists($this->cacheDir)) {
+            $filesystem = new Filesystem();
+            $filesystem->remove($this->cacheDir);
+        }
+        mkdir($this->cacheDir, 0777, true);
 
-        $this->container = self::$kernel->getContainer();
+        $this->kernel = new TestKernel('test', false);
+        $this->kernel->boot();
+        $this->container = $this->kernel->getContainer();
 
         $stJohns    = new School('St John\'s School');
         $lighthouse = new School('Lighthouse Academy');
@@ -33,6 +45,14 @@ class ImportManagerTest extends KernelTestCase
         $studentRepository->addStudent(new Student($stJohns, 1));
         $studentRepository->addStudent(new Student($stJohns, 2));
         $studentRepository->addStudent(new Student($lighthouse, 1));
+    }
+
+    public function tearDown()
+    {
+        if (file_exists($this->cacheDir)) {
+            $filesystem = new Filesystem();
+            $filesystem->remove($this->cacheDir);
+        }
     }
 
     public function testFruitsSimple()
