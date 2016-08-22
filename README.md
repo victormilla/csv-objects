@@ -44,4 +44,6 @@ classes:
     contract: ['CSVObjects\ImportBundle\Tests\Objects\Contract', 'getContractFromId' ]
 ```
 
+For the object mappings, you can also use a service in the `['@service_name', 'method']` notation.
+
 For a more complex example see `school-results.yml` and `school-results.csv`.
