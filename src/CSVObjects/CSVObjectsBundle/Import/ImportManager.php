@@ -36,7 +36,7 @@ class ImportManager
      *
      * @return object[]
      */
-    public function import(array $definition, string $filename)
+    public function import(array $definition, $filename)
     {
         // Join the definition classes with the already known classes from config.yml
         if (!isset($definition['classes'])) {

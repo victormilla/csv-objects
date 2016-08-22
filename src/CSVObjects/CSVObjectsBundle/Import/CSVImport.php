@@ -42,7 +42,7 @@ class CSVImport
      *
      * @return object[]
      */
-    public static function import(array $definition, string $filename)
+    public static function import(array $definition, $filename)
     {
         $import = new CSVImport(new ImportDefinition($definition));
         $file   = new File($filename);
