@@ -84,11 +84,11 @@ class CSVImport
         $data      = array();
         $extension = strtolower($file->getExtension());
 
-        if (!in_array($extension, ['csv', 'xlsx'])) {
+        if (!in_array($extension, array('csv', 'xlsx'))) {
             $extension = $file->guessExtension();
         }
 
-        if ('csv' === $extension) {
+        if ('csv' === $extension || 'txt' === $extension) {
             $fileHandle = fopen($file->getPathname(), 'r');
             $data       = array();
 

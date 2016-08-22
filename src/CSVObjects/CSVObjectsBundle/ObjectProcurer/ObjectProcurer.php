@@ -72,10 +72,10 @@ class ObjectProcurer
                 }
 
                 return call_user_func_array(
-                    [
+                    array(
                         $this->container->get(substr($this->class[0], 1)),
                         $this->class[1]
-                    ],
+                    ),
                     $arguments
                 );
         }

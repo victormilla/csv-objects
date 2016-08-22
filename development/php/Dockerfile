@@ -1,4 +1,4 @@
-FROM php:7-cli
+FROM php:5.6-cli
 
 # Installed shared dependencies
 

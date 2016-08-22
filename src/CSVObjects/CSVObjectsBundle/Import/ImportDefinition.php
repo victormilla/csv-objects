@@ -116,17 +116,17 @@ class ImportDefinition
     private function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
-            [
+            array(
                 'name'    => null,
-                'columns' => [],
-                'classes' => [],
-                'copy'    => [],
-            ]
+                'columns' => array(),
+                'classes' => array(),
+                'copy'    => array(),
+            )
         );
 
         $resolver->setRequired('columns');
-        $resolver->setAllowedTypes('name', ['string', 'null']);
-        $resolver->setAllowedTypes('classes', ['array']);
+        $resolver->setAllowedTypes('name', array('string', 'null'));
+        $resolver->setAllowedTypes('classes', array('array'));
     }
 
     /**
@@ -135,7 +135,7 @@ class ImportDefinition
      *
      * @return mixed
      */
-    private function parseColumnDefinition(string $columnName, array $definition)
+    private function parseColumnDefinition($columnName, array $definition)
     {
         // Expect
         if (isset($definition['expect'])) {
@@ -304,7 +304,8 @@ class ImportDefinition
                     ? new \DateTime($row[$columnName])
                     : \DateTime::createFromFormat($this->dateSourceFormat[$columnName], $row[$columnName]);
 
-                if (false === $date || 0 < \DateTime::getLastErrors()['warning_count']) {
+                $errors = \DateTime::getLastErrors();
+                if (false === $date || 0 < $errors['warning_count']) {
                     throw new \Exception();
                 }
 
@@ -349,14 +350,14 @@ class ImportDefinition
         }
 
         foreach ($this->returnDataColumns as $columnName => $arguments) {
-            $args = [];
+            $args = array();
 
             if (!is_array($arguments)) {
                 $arguments = array($arguments);
             }
 
             foreach ($arguments as $argument) {
-                $args[] = $this->makeArgumentReplacements($argument, $row);;
+                $args[] = $this->makeArgumentReplacements($argument, $row);
             }
 
             $r[] = $args;
@@ -371,7 +372,7 @@ class ImportDefinition
      *
      * @return string
      */
-    private function makeArgumentReplacements(string $argument, array $row)
+    private function makeArgumentReplacements($argument, array $row)
     {
         $numberMatches = preg_match_all(
             sprintf('/%s[^%s]+?%s/', self::COLUMN_DELIMITER, self::COLUMN_DELIMITER, self::COLUMN_DELIMITER),
