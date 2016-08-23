@@ -87,6 +87,21 @@ class CSVImportTest extends KernelTestCase
         $this->assertEquals('yellow', $banana->getColour());
     }
 
+    public function testXlsxFile()
+    {
+        $definition = Yaml::parse(file_get_contents(__DIR__ . '/ImportDefinitions/fruits-full.yml'));
+        $file = __DIR__ . '/CSVs/fruits-full.xlsx';
+        $fruits = CSVImport::import($definition, $file);
+
+        /** @var Fruit[] $fruits */
+
+        $this->assertCount(3, $fruits);
+
+        foreach ($fruits as $fruit) {
+            $this->assertInstanceOf(Fruit::class, $fruit);
+        }
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      */

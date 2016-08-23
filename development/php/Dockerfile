@@ -2,10 +2,11 @@ FROM php:5.6-cli
 
 # Installed shared dependencies
 
-RUN apt-get update && \
-    apt-get install -y \
+RUN apt-get update &&   \
+    apt-get install -y  \
         build-essential \
-        wget
+        wget            \
+        python
 
 # Install composer and its requirements
 
