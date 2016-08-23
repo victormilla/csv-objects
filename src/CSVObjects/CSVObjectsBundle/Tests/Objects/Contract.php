@@ -9,7 +9,7 @@ class Contract
      */
     private $id;
 
-    public function __construct(int $id)
+    public function __construct($id)
     {
         $this->id = $id;
     }
@@ -19,7 +19,7 @@ class Contract
      *
      * @return Contract
      */
-    public static function getContractFromId(int $id)
+    public static function getContractFromId($id)
     {
         return new Contract($id);
     }

@@ -29,7 +29,7 @@ RUN cd /tmp && \
     phpize && \
     ./configure && \
     make && \
-    cp modules/xdebug.so /usr/local/lib/php/extensions/no-debug-non-zts-20151012
+    cp modules/xdebug.so /usr/local/lib/php/extensions/no-debug-non-zts-20131226
 
 # Enable SSH
 

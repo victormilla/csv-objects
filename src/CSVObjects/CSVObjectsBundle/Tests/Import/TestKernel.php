@@ -2,6 +2,7 @@
 
 namespace CSVObjects\CSVObjectsBundle\Tests\Import;
 
+use CSVObjects\CSVObjectsBundle\CSVObjectsBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpKernel\Kernel;
 
@@ -15,7 +16,7 @@ class TestKernel extends Kernel
     public function registerBundles()
     {
         return array(
-            new \CSVObjects\CSVObjectsBundle\CSVObjectsBundle(),
+            new CSVObjectsBundle(),
         );
     }
 

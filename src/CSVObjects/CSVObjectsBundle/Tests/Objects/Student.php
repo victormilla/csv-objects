@@ -14,7 +14,7 @@ class Student
      */
     private $studentId;
 
-    public function __construct(School $school, int $studentId)
+    public function __construct(School $school, $studentId)
     {
         $this->school    = $school;
         $this->studentId = $studentId;

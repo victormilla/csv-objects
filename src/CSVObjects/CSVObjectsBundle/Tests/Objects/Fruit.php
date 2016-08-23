@@ -39,7 +39,7 @@ class Fruit
      */
     private $contract;
 
-    public function __construct(string $name)
+    public function __construct($name)
     {
         $this->name = $name;
     }
@@ -47,7 +47,7 @@ class Fruit
     /**
      * @return string
      */
-    public function getName(): string
+    public function getName()
     {
         return $this->name;
     }
@@ -55,7 +55,7 @@ class Fruit
     /**
      * @param string $colour
      */
-    public function setColour(string $colour)
+    public function setColour($colour)
     {
         $this->colour = $colour;
     }
@@ -71,7 +71,7 @@ class Fruit
     /**
      * @param string $originCountry
      */
-    public function setOriginCountry(string $originCountry)
+    public function setOriginCountry($originCountry)
     {
         $this->originCountry = $originCountry;
     }
@@ -87,7 +87,7 @@ class Fruit
     /**
      * @param string $originCity
      */
-    public function setOriginCity(string $originCity)
+    public function setOriginCity($originCity)
     {
         $this->originCity = $originCity;
     }
@@ -103,7 +103,7 @@ class Fruit
     /**
      * @param string $class
      */
-    public function setClass(string $class)
+    public function setClass($class)
     {
         $this->class = $class;
     }
@@ -119,7 +119,7 @@ class Fruit
     /**
      * @param string $expiryDate
      */
-    public function setExpiryDate(string $expiryDate)
+    public function setExpiryDate($expiryDate)
     {
         $this->expiryDate = $expiryDate;
     }
@@ -160,12 +160,12 @@ class Fruit
      * @return Fruit
      */
     public static function getFruitFromFullInfo(
-        string $name,
-        string $colour = null,
-        string $originCountry = null,
-        string $originCity = null,
-        string $class = null,
-        string $expiryDate = null,
+        $name,
+        $colour = null,
+        $originCountry = null,
+        $originCity = null,
+        $class = null,
+        $expiryDate = null,
         Contract $contract = null
     ) {
         $fruit = new Fruit($name);

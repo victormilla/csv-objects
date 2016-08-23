@@ -19,7 +19,7 @@ class Result
      */
     private $grade;
 
-    public function __construct(Student $student, string $subjectCode, string $grade)
+    public function __construct(Student $student, $subjectCode, $grade)
     {
         $this->student     = $student;
         $this->subjectCode = $subjectCode;
@@ -29,7 +29,7 @@ class Result
     /**
      * @return Student
      */
-    public function getStudent(): Student
+    public function getStudent()
     {
         return $this->student;
     }
@@ -37,7 +37,7 @@ class Result
     /**
      * @return string
      */
-    public function getSubjectCode(): string
+    public function getSubjectCode()
     {
         return $this->subjectCode;
     }
@@ -45,7 +45,7 @@ class Result
     /**
      * @return string
      */
-    public function getGrade(): string
+    public function getGrade()
     {
         return $this->grade;
     }
