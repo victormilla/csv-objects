@@ -26,6 +26,8 @@ class CSVImportTest extends KernelTestCase
         StaticStudentRepository::addStudent(new Student($stJohns, 1));
         StaticStudentRepository::addStudent(new Student($stJohns, 2));
         StaticStudentRepository::addStudent(new Student($lighthouse, 1));
+
+        date_default_timezone_set ('Europe/London');
     }
 
     public function testEnvironment()
