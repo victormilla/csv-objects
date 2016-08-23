@@ -188,12 +188,12 @@ class ImportDefinition
                     }
                 };
             } elseif ('date' === $validation) {
-                $sourceFormat = isset($this->dateSourceFormat[$columnName]) ? $this->dateSourceFormat[$columnName] : null;
-                $this->validations[$columnName][] = function ($row) use ($columnName, $validation, $sourceFormat) {
+                $format = isset($this->dateFormat[$columnName]) ? $this->dateFormat[$columnName] : null;
+                $this->validations[$columnName][] = function ($row) use ($columnName, $validation, $format) {
                     try {
-                        $date = null === $sourceFormat
+                        $date = null === $format
                             ? new \DateTime($row[$columnName])
-                            : \DateTime::createFromFormat($sourceFormat, $row[$columnName]);
+                            : \DateTime::createFromFormat($format, $row[$columnName]);
 
                         if (false === $date) {
                             throw new \Exception();
