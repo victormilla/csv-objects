@@ -5,6 +5,7 @@ namespace CSVObjects\CSVObjectsBundle\Import;
 use CSVObjects\CSVObjectsBundle\ObjectProcurer\ObjectProcurer;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Process\Process;
 
 class CSVImport
 {
@@ -81,30 +82,37 @@ class CSVImport
      */
     private function readFile(File $file)
     {
-        $data      = array();
-        $extension = strtolower($file->getExtension());
+        $extension = $file->guessExtension();
 
-        if (!in_array($extension, array('csv', 'xlsx'))) {
-            $extension = $file->guessExtension();
-        }
+        if ('xlsx' === $extension) {
+            $pathname = sys_get_temp_dir() . uniqid('/xlsx2csv_', true);
+            $process = new Process('python ' . __DIR__ . '/xlsx2csv.py ' . $file->getPathname() . ' ' . $pathname);
+            $process->run();
 
-        if ('csv' === $extension || 'txt' === $extension) {
-            $fileHandle = fopen($file->getPathname(), 'r');
-            $data       = array();
-
-            while (!feof($fileHandle)) {
-                $line = fgetcsv($fileHandle);
-
-                if (false !== $line) {
-                    $data[] = $line;
-                }
+            if (!$process->isSuccessful()) {
+                unlink($pathname);
+                throw new \InvalidArgumentException('Unable to convert XLSX file into CSV format');
             }
-
-            fclose($fileHandle);
-        } elseif ('xlsx' === $extension) {
-            // @TODO read excel to array
+        } elseif ('csv' === $extension || 'txt' === $extension) {
+            $pathname = $file->getPathname();
         } else {
             throw new \InvalidArgumentException('Unrecognised file type. The valid types are CSV and XLSX');
+        }
+
+        $fileHandle = fopen($pathname, 'r');
+        $data       = array();
+
+        while (!feof($fileHandle)) {
+            $line = fgetcsv($fileHandle);
+
+            if (false !== $line) {
+                $data[] = $line;
+            }
+        }
+
+        fclose($fileHandle);
+        if ('xlsx' === $extension) {
+            unlink($pathname);
         }
 
         return $data;
