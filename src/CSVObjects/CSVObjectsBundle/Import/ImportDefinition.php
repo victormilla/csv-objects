@@ -157,6 +157,19 @@ class ImportDefinition
             unset($definition['expect']);
         }
 
+        // Date formats
+        if (isset($definition['sourceFormat']) || isset($definition['format'])) {
+            if (isset($definition['sourceFormat'])) {
+                $this->dateSourceFormat[$columnName] = $definition['sourceFormat'];
+            }
+
+            if (isset($definition['format'])) {
+                $this->dateFormat[$columnName] = $definition['format'];
+            }
+
+            unset($definition['sourceFormat'], $definition['format']);
+        }
+
         // Validate
         if (isset($definition['validate'])) {
             $validation = $definition['validate'];
@@ -175,26 +188,12 @@ class ImportDefinition
                     }
                 };
             } elseif ('date' === $validation) {
-                $sourceFormat = isset($definition['sourceFormat'])
-                    ? $definition['sourceFormat']
-                    : null;
-
-                if (null !== $sourceFormat) {
-                    $this->dateSourceFormat[$columnName] = $sourceFormat;
-                }
-
-                if (isset($definition['format'])) {
-                    $this->dateFormat[$columnName] = $definition['format'];
-                    $sourceFormat                  = $definition['format'];
-                }
-
-                unset($definition['sourceFormat'], $definition['format']);
-
-                $this->validations[$columnName][] = function ($row) use ($columnName, $validation, $sourceFormat) {
+                $format = isset($this->dateFormat[$columnName]) ? $this->dateFormat[$columnName] : null;
+                $this->validations[$columnName][] = function ($row) use ($columnName, $validation, $format) {
                     try {
-                        $date = null === $sourceFormat
+                        $date = null === $format
                             ? new \DateTime($row[$columnName])
-                            : \DateTime::createFromFormat($sourceFormat, $row[$columnName]);
+                            : \DateTime::createFromFormat($format, $row[$columnName]);
 
                         if (false === $date) {
                             throw new \Exception();
