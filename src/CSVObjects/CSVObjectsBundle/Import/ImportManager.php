@@ -17,6 +17,11 @@ class ImportManager
      */
     private $configClasses = array();
 
+    /**
+     * @var string[]
+     */
+    private $data = array();
+
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -33,10 +38,11 @@ class ImportManager
     /**
      * @param array  $definition
      * @param string $filename
+     * @param bool   $rememberData Optionally remember it for debugging purposes
      *
      * @return object[]
      */
-    public function import(array $definition, $filename)
+    public function import(array $definition, $filename, $rememberData = false)
     {
         // Join the definition classes with the already known classes from config.yml
         if (!isset($definition['classes'])) {
@@ -50,6 +56,20 @@ class ImportManager
 
         $import->setContainer($this->container);
 
-        return $import->extractResultsFromFile($file);
+        $results = $import->extractResultsFromFile($file, $rememberData);
+
+        if ($rememberData) {
+            $this->data = $import->getData();
+        }
+
+        return $results;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getData()
+    {
+        return $this->data;
     }
 }

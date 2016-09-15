@@ -29,6 +29,11 @@ class CSVImport
      */
     private $classes;
 
+    /**
+     * @var string[]
+     */
+    private $data = array();
+
     public function __construct(ImportDefinition $definition)
     {
         $this->definition  = $definition;
@@ -53,10 +58,11 @@ class CSVImport
 
     /**
      * @param File $file
+     * @param bool $rememberData
      *
      * @return array
      */
-    public function extractResultsFromFile(File $file)
+    public function extractResultsFromFile(File $file, $rememberData = false)
     {
         $data = $this->readFile($file);
 
@@ -65,6 +71,10 @@ class CSVImport
 
         $headings = $data[0];
         $results  = array();
+
+        if ($rememberData) {
+            $this->data = $data;
+        }
 
         for ($i = 1; $i < count($data); $i++) {
             foreach ($this->createResults(array_combine($headings, $data[$i])) as $result) {
@@ -194,5 +204,13 @@ class CSVImport
         foreach ($this->classes as $class) {
             $class->setContainer($container);
         }
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getData()
+    {
+        return $this->data;
     }
 }
