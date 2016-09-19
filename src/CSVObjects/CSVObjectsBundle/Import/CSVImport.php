@@ -30,7 +30,7 @@ class CSVImport
     private $classes;
 
     /**
-     * @var string[]
+     * @var CSVData
      */
     private $data = array();
 
@@ -69,17 +69,22 @@ class CSVImport
         $this->addColumnCopies($data);
         $this->validate($data);
 
+        $j        = 0;
         $headings = $data[0];
         $results  = array();
-
-        if ($rememberData) {
-            $this->data = $data;
-        }
+        $csvData  = new CSVData($data);
 
         for ($i = 1; $i < count($data); $i++) {
             foreach ($this->createResults(array_combine($headings, $data[$i])) as $result) {
                 $results[] = $result;
+
+                $csvData->setResultRow($j, $i);
+                $j++;
             }
+        }
+
+        if ($rememberData) {
+            $this->data = $csvData;
         }
 
         return $results;
@@ -207,7 +212,7 @@ class CSVImport
     }
 
     /**
-     * @return string[]
+     * @return CSVData
      */
     public function getData()
     {

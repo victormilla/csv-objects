@@ -18,9 +18,9 @@ class ImportManager
     private $configClasses = array();
 
     /**
-     * @var string[]
+     * @var CSVData
      */
-    private $data = array();
+    private $data;
 
     public function __construct(ContainerInterface $container)
     {
@@ -66,7 +66,7 @@ class ImportManager
     }
 
     /**
-     * @return string[]
+     * @return CSVData
      */
     public function getData()
     {

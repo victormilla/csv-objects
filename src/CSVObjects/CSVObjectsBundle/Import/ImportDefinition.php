@@ -425,4 +425,12 @@ class ImportDefinition
     {
         return $this->options['copy'];
     }
+
+    /**
+     * @return int
+     */
+    public function getResultsPerRow()
+    {
+        return count($this->returnDataColumns);
+    }
 }
