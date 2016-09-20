@@ -27,7 +27,7 @@ class CSVImportTest extends KernelTestCase
         StaticStudentRepository::addStudent(new Student($stJohns, 2));
         StaticStudentRepository::addStudent(new Student($lighthouse, 1));
 
-        date_default_timezone_set ('Europe/London');
+        date_default_timezone_set('Europe/London');
     }
 
     public function testEnvironment()
@@ -41,7 +41,7 @@ class CSVImportTest extends KernelTestCase
     {
         $definition = Yaml::parse(file_get_contents(__DIR__ . '/ImportDefinitions/fruits-basic.yml'));
         $file       = __DIR__ . '/CSVs/fruits-basic.csv';
-        $fruits     = CSVImport::import($definition, $file);
+        $fruits     = CSVImport::import($definition, $file)->getResults();
 
         /** @var Fruit[] $fruits */
 
@@ -64,7 +64,7 @@ class CSVImportTest extends KernelTestCase
     {
         $definition = Yaml::parse(file_get_contents(__DIR__ . '/ImportDefinitions/fruits-full.yml'));
         $file       = __DIR__ . '/CSVs/fruits-full.csv';
-        $fruits     = CSVImport::import($definition, $file);
+        $fruits     = CSVImport::import($definition, $file)->getResults();
 
         /** @var Fruit[] $fruits */
 
@@ -90,8 +90,8 @@ class CSVImportTest extends KernelTestCase
     public function testXlsxFile()
     {
         $definition = Yaml::parse(file_get_contents(__DIR__ . '/ImportDefinitions/fruits-full.yml'));
-        $file = __DIR__ . '/CSVs/fruits-full.xlsx';
-        $fruits = CSVImport::import($definition, $file);
+        $file       = __DIR__ . '/CSVs/fruits-full.xlsx';
+        $fruits     = CSVImport::import($definition, $file)->getResults();
 
         /** @var Fruit[] $fruits */
 
@@ -132,14 +132,14 @@ class CSVImportTest extends KernelTestCase
         $definition = Yaml::parse(file_get_contents(__DIR__ . '/ImportDefinitions/fruits-full.yml'));
         $file       = __DIR__ . '/CSVs/fruits-full-wrong-validate-date.csv';
 
-        CSVImport::import($definition, $file);
+        CSVImport::import($definition, $file)->getResults();
     }
 
     public function testUnmappedValue()
     {
         $definition = Yaml::parse(file_get_contents(__DIR__ . '/ImportDefinitions/fruits-full.yml'));
         $file       = __DIR__ . '/CSVs/fruits-full-unmapped-value.csv';
-        $banana     = CSVImport::import($definition, $file)[2];
+        $banana     = CSVImport::import($definition, $file)->getResults()[2];
 
         /** @var Fruit $banana */
 
@@ -150,7 +150,7 @@ class CSVImportTest extends KernelTestCase
     {
         $definition = Yaml::parse(file_get_contents(__DIR__ . '/ImportDefinitions/fruits-full.yml'));
         $file       = __DIR__ . '/CSVs/fruits-full.csv';
-        $fruits     = CSVImport::import($definition, $file);
+        $fruits     = CSVImport::import($definition, $file)->getResults();
 
         /** @var Fruit[] $fruits */
 
@@ -167,7 +167,7 @@ class CSVImportTest extends KernelTestCase
     {
         $definition = Yaml::parse(file_get_contents(__DIR__ . '/ImportDefinitions/fruits-full.yml'));
         $file       = __DIR__ . '/CSVs/fruits-full.csv';
-        $fruits     = CSVImport::import($definition, $file);
+        $fruits     = CSVImport::import($definition, $file)->getResults();
 
         /** @var Fruit[] $fruits */
 
@@ -184,7 +184,7 @@ class CSVImportTest extends KernelTestCase
     {
         $definition = Yaml::parse(file_get_contents(__DIR__ . '/ImportDefinitions/fruits-full.yml'));
         $file       = __DIR__ . '/CSVs/fruits-full.csv';
-        $fruits     = CSVImport::import($definition, $file);
+        $fruits     = CSVImport::import($definition, $file)->getResults();
 
         /** @var Fruit[] $fruits */
 
@@ -201,7 +201,7 @@ class CSVImportTest extends KernelTestCase
     {
         $definition = Yaml::parse(file_get_contents(__DIR__ . '/ImportDefinitions/fruits-full.yml'));
         $file       = __DIR__ . '/CSVs/fruits-full.csv';
-        $fruits     = CSVImport::import($definition, $file);
+        $fruits     = CSVImport::import($definition, $file)->getResults();
 
         /** @var Fruit[] $fruits */
 
@@ -218,7 +218,7 @@ class CSVImportTest extends KernelTestCase
     {
         $definition = Yaml::parse(file_get_contents(__DIR__ . '/ImportDefinitions/fruits-full.yml'));
         $file       = __DIR__ . '/CSVs/fruits-full.csv';
-        $fruits     = CSVImport::import($definition, $file);
+        $fruits     = CSVImport::import($definition, $file)->getResults();
 
         /** @var Fruit[] $fruits */
 
@@ -235,7 +235,7 @@ class CSVImportTest extends KernelTestCase
     {
         $definition = Yaml::parse(file_get_contents(__DIR__ . '/ImportDefinitions/school-results.yml'));
         $file       = __DIR__ . '/CSVs/school-results.csv';
-        $results    = CSVImport::import($definition, $file);
+        $results    = CSVImport::import($definition, $file)->getResults();
 
         /** @var Result[] $results */
 
@@ -255,5 +255,61 @@ class CSVImportTest extends KernelTestCase
         $this->assertEquals('1', $results[4]->getStudent()->getId());
         $this->assertEquals('EN', $results[4]->getSubjectCode());
         $this->assertEquals('7a', $results[4]->getGrade());
+    }
+
+    public function testRawDataWhenRemembered()
+    {
+        $definition      = Yaml::parse(file_get_contents(__DIR__ . '/ImportDefinitions/fruits-basic.yml'));
+        $file            = __DIR__ . '/CSVs/fruits-basic.csv';
+        $importedResults = CSVImport::import($definition, $file, true);
+
+        $expected = array(
+            array("Name", "Weight"),
+            array("Apple", "2"),
+            array("Pineapple", "3"),
+            array("Banana", "1")
+        );
+
+        $this->assertEquals($expected, $importedResults->getRawData());
+    }
+
+    public function testRawDataLineOfResult()
+    {
+        $definition      = Yaml::parse(file_get_contents(__DIR__ . '/ImportDefinitions/school-results.yml'));
+        $file            = __DIR__ . '/CSVs/school-results.csv';
+        $importedResults = CSVImport::import($definition, $file, true);
+
+        $this->assertEquals("St John's School, 1, 6a, 6b", $importedResults->getRawDataForResult(0, true));
+        $this->assertEquals(array("St John's School", "1", "6a", "6b"), $importedResults->getRawDataForResult(1));
+        $this->assertEquals("Lighthouse Academy, 1, 7a, 3b", $importedResults->getRawDataForResult(4, true));
+        $this->assertEquals("", $importedResults->getRawDataForResult(6, true));
+        $this->assertEquals(array(), $importedResults->getRawDataForResult(6));
+    }
+
+    public function testRawDataNumberOfLine()
+    {
+        $definition      = Yaml::parse(file_get_contents(__DIR__ . '/ImportDefinitions/school-results.yml'));
+        $file            = __DIR__ . '/CSVs/school-results.csv';
+        $importedResults = CSVImport::import($definition, $file, true);
+
+        $this->assertEquals(1, $importedResults->getLineOfResult(0));
+        $this->assertEquals(1, $importedResults->getLineOfResult(1));
+        $this->assertEquals(3, $importedResults->getLineOfResult(4));
+        $this->assertEquals(null, $importedResults->getLineOfResult(6));
+    }
+
+    public function testRawDataIsNullWhenNotRemembered()
+    {
+        $definition      = Yaml::parse(file_get_contents(__DIR__ . '/ImportDefinitions/school-results.yml'));
+        $file            = __DIR__ . '/CSVs/school-results.csv';
+        $importedResults = CSVImport::import($definition, $file);
+
+        $this->assertNull($importedResults->getRawData());
+        $this->assertEquals(1, $importedResults->getLineOfResult(0));
+        $this->assertEquals(1, $importedResults->getLineOfResult(1));
+        $this->assertEquals(3, $importedResults->getLineOfResult(4));
+        $this->assertEquals(null, $importedResults->getLineOfResult(6));
+        $this->assertEquals("", $importedResults->getRawDataForResult(0, true));
+        $this->assertEquals(array(), $importedResults->getRawDataForResult(0));
     }
 }

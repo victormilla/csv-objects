@@ -59,7 +59,7 @@ class ImportManagerTest extends \PHPUnit_Framework_TestCase
     {
         $definition = Yaml::parse(file_get_contents(__DIR__ . '/ImportDefinitions/fruits-basic.yml'));
         $file       = __DIR__ . '/CSVs/fruits-basic.csv';
-        $fruits     = $this->container->get('csv_objects.import_manager')->import($definition, $file);
+        $fruits     = $this->container->get('csv_objects.import_manager')->import($definition, $file)->getResults();
 
         $this->assertCount(3, $fruits);
     }
@@ -68,7 +68,7 @@ class ImportManagerTest extends \PHPUnit_Framework_TestCase
     {
         $definition = Yaml::parse(file_get_contents(__DIR__ . '/ImportDefinitions/school-results-config.yml'));
         $file       = __DIR__ . '/CSVs/school-results.csv';
-        $results    = $this->container->get('csv_objects.import_manager')->import($definition, $file);
+        $results    = $this->container->get('csv_objects.import_manager')->import($definition, $file)->getResults();
 
         $this->assertCount(6, $results);
     }
