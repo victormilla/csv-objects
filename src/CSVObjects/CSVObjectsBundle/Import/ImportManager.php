@@ -17,11 +17,6 @@ class ImportManager
      */
     private $configClasses = array();
 
-    /**
-     * @var string[]
-     */
-    private $data = array();
-
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -40,7 +35,7 @@ class ImportManager
      * @param string $filename
      * @param bool   $rememberData Optionally remember it for debugging purposes
      *
-     * @return object[]
+     * @return ImportedResults
      */
     public function import(array $definition, $filename, $rememberData = false)
     {
@@ -58,18 +53,6 @@ class ImportManager
 
         $results = $import->extractResultsFromFile($file, $rememberData);
 
-        if ($rememberData) {
-            $this->data = $import->getData();
-        }
-
         return $results;
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getData()
-    {
-        return $this->data;
     }
 }

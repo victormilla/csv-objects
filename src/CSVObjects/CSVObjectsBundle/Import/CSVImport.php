@@ -30,7 +30,7 @@ class CSVImport
     private $classes;
 
     /**
-     * @var string[]
+     * @var ImportedResults
      */
     private $data = array();
 
@@ -43,46 +43,43 @@ class CSVImport
     }
 
     /**
-     * @param array  $definition
+     * @param array $definition
      * @param string $filename
+     * @param bool $rememberRawData
      *
-     * @return object[]
+     * @return ImportedResults
      */
-    public static function import(array $definition, $filename)
+    public static function import(array $definition, $filename, $rememberRawData = false)
     {
         $import = new CSVImport(new ImportDefinition($definition));
         $file   = new File($filename);
 
-        return $import->extractResultsFromFile($file);
+        return $import->extractResultsFromFile($file, $rememberRawData);
     }
 
     /**
      * @param File $file
-     * @param bool $rememberData
+     * @param bool $rememberRawData
      *
-     * @return array
+     * @return ImportedResults
      */
-    public function extractResultsFromFile(File $file, $rememberData = false)
+    public function extractResultsFromFile(File $file, $rememberRawData = false)
     {
         $data = $this->readFile($file);
 
         $this->addColumnCopies($data);
         $this->validate($data);
 
-        $headings = $data[0];
-        $results  = array();
-
-        if ($rememberData) {
-            $this->data = $data;
-        }
+        $headings        = $data[0];
+        $importedResults = new ImportedResults($rememberRawData ? $data : null);
 
         for ($i = 1; $i < count($data); $i++) {
             foreach ($this->createResults(array_combine($headings, $data[$i])) as $result) {
-                $results[] = $result;
+                $importedResults->addResult($result, $i);
             }
         }
 
-        return $results;
+        return $importedResults;
     }
 
     /**
@@ -96,7 +93,7 @@ class CSVImport
 
         if ('xlsx' === $extension) {
             $pathname = sys_get_temp_dir() . uniqid('/xlsx2csv_', true);
-            $process = new Process('python ' . __DIR__ . '/xlsx2csv.py ' . $file->getPathname() . ' ' . $pathname);
+            $process  = new Process('python ' . __DIR__ . '/xlsx2csv.py ' . $file->getPathname() . ' ' . $pathname);
             $process->run();
 
             if (!$process->isSuccessful()) {
@@ -207,7 +204,7 @@ class CSVImport
     }
 
     /**
-     * @return string[]
+     * @return ImportedResults
      */
     public function getData()
     {
