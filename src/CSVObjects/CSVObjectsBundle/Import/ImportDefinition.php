@@ -327,7 +327,7 @@ class ImportDefinition
         foreach ($this->maps as $columnName => $map) {
             $row[$columnName] = isset($map[$row[$columnName]])
                 ? $map[$row[$columnName]]
-                : null;
+                : $row[$columnName];
         }
 
         // Process row validation rules
