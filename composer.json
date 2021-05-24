@@ -12,8 +12,7 @@
         "symfony/process": "~2.0|~3.0"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "^3.0",
-        "phpunit/phpunit": "^4.8"
+        "symfony/phpunit-bridge": "^3.0"
     },
     "config": {
         "platform": {
